@@ -1,5 +1,5 @@
 <template>
-  <div class="w-screen h-screen flex justify-center gap-[20px] mt-[20px]">
+  <div class="w-screen h-screen flex justify-center gap-[20px] mt-[40px] mb-[40px]">
     <div class="w-[800px] h-screen rounded-2xl bg-gray-200">
       <div class="w-[800px] h-[300px] rounded-2xl overflow-hidden relative">
         <a-carousel arrows autoplay class="h-full">
@@ -25,15 +25,42 @@
         </a-carousel>
       </div>
     </div>
-    <div class="w-[380px] h-screen rounded-2xl bg-gray-200"></div>
+    <div class="w-[380px] h-screen rounded-2xl bg-gray-200">
+      <div class="w-[380px] border border-[#d9d9d9] rounded-2xl">
+        <CustomCalendar :day-details="mockDetails" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { LeftOutlined, RightOutlined } from '@ant-design/icons-vue';
-const onChange = current => {
-  console.log(current);
-};
+import CustomCalendar from '../components/CustomCalendar.vue';
+
+// 修改为数组格式的模拟数据
+const mockDetails = [
+{
+    Date: "2025-01-01",
+    Question: "Vue3的组合式API有哪些优势？请详细说明。"
+  },
+  {
+    Date: "2025-01-02",
+    Question: "说说你对Vue3中ref和reactive的理解？"
+  },
+  {
+    Date: "2025-01-03",
+    Question: "Vue3中的生命周期钩子有哪些变化？"
+  },
+  {
+    Date: "2025-01-04",
+    Question: "什么是Vue3的响应式原理？"
+  },
+  {
+    Date: "2025-01-05",
+    Question: "Vue3中的Teleport组件是什么？"
+  },
+  // ...其他数据项...
+];
 </script>
 
 <style scoped>
@@ -126,5 +153,34 @@ const onChange = current => {
 .custom-arrow :deep(svg) {
   font-size: 20px;
   color: #fff;
+}
+
+.custom-calendar {
+  border: 1px solid #e2e8f0;
+}
+
+.custom-calendar th {
+  font-weight: 500;
+}
+
+.custom-calendar td {
+  border-radius: 9999px;
+  transition: all 0.2s;
+}
+
+/* 确保弹出提示框在其他元素之上 */
+.group:hover .group-hover\:block {
+  display: block;
+}
+
+/* 提示框样式 */
+.group-hover\:block {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* 移除之前的样式，使用新的样式 */
+.custom-calendar td:hover .rounded-full {
+  background-color: #EBF5FF;
+  color: #2563EB;
 }
 </style>
