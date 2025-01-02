@@ -1,45 +1,85 @@
 <template>
-  <div class="w-screen h-screen flex justify-center gap-[20px] mt-[40px] mb-[40px]">
-    <div class="w-[800px] h-screen rounded-2xl bg-gray-200">
-      <div class="w-[800px] h-[300px] rounded-2xl overflow-hidden relative">
+  <div class="w-screen min-h-screen flex justify-center gap-[20px] mt-[40px] mb-[40px]">
+    <div class="w-[840px] flex flex-col gap-5">
+      <div class="w-full h-[300px] rounded-2xl overflow-hidden relative">
         <a-carousel arrows autoplay class="h-full">
           <template #prevArrow>
             <div class="custom-arrow prev">
-              <left-outlined />
+              <left-outlined/>
             </div>
           </template>
           <template #nextArrow>
             <div class="custom-arrow next">
-              <right-outlined />
+              <right-outlined/>
             </div>
           </template>
           <div class="carousel-item">
-            <img src="/banner1.jpg" alt="banner1" class="w-full h-full object-cover" />
+            <img src="/banner1.jpg" alt="banner1" class="w-full h-full object-cover"/>
           </div>
           <div class="carousel-item">
-            <img src="/banner2.jpg" alt="banner2" class="w-full h-full object-cover" />
+            <img src="/banner2.jpg" alt="banner2" class="w-full h-full object-cover"/>
           </div>
           <div class="carousel-item">
-            <img src="/banner3.jpg" alt="banner3" class="w-full h-full object-cover" />
+            <img src="/banner3.jpg" alt="banner3" class="w-full h-full object-cover"/>
           </div>
         </a-carousel>
       </div>
+      <!-- 文章区域 -->
+      <div class="w-full">
+        <div class="w-full rounded-2xl bg-white">
+          <!-- 按钮组容器 -->
+          <div class="bg-white rounded-t-2xl">
+            <div class="p-5 flex gap-2">
+              <button 
+                v-for="btn in buttons" 
+                :key="btn.name"
+                @click="handleButtonClick(btn.id)"
+                :class="[
+                  'px-4 py-1.5 text-sm transition-colors outline-none focus:outline-none border-none hover:border-none focus:border-none rounded-[4px]',
+                  activeButton === btn.id 
+                    ? 'bg-blue-500 text-white' 
+                    : 'bg-transparent text-[#737373] hover:text-[#1A1A1A]'
+                ]"
+              >
+                {{ btn.name }}
+              </button>
+            </div>
+            <div class="mx-5 h-[1px] bg-[#E5E5E5]"></div>
+          </div>
+
+          <!-- 文章列表区域 -->
+          <div class="p-5">
+            <div class="grid divide-y divide-gray-200">
+              <ArticleCard
+                v-for="article in articles"
+                :key="article.id"
+                :article="article"
+                class="first:pt-0 pt-4"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="w-[380px] h-screen rounded-2xl bg-gray-200">
-      <div class="w-[380px] border border-[#d9d9d9] rounded-2xl">
-        <CustomCalendar :day-details="mockDetails" />
+    <div class="w-[340px]">
+      <div class="sticky top-5 w-full">
+        <div class="w-full border border-[#d9d9d9] rounded-2xl bg-white">
+          <CustomCalendar :day-details="mockDetails"/>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { LeftOutlined, RightOutlined } from '@ant-design/icons-vue';
+import {LeftOutlined, RightOutlined} from '@ant-design/icons-vue';
 import CustomCalendar from '../components/CustomCalendar.vue';
+import ArticleCard from '../components/ArticleCard.vue';
+import { ref } from 'vue';
 
 // 修改为数组格式的模拟数据
 const mockDetails = [
-{
+  {
     Date: "2025-01-01",
     Question: "Vue3的组合式API有哪些优势？请详细说明。"
   },
@@ -61,6 +101,82 @@ const mockDetails = [
   },
   // ...其他数据项...
 ];
+
+// 修改按钮数据，添加id和更有意义的名称
+const buttons = [
+  { id: 1, name: '推荐' },
+  { id: 2, name: '最多点赞' },
+  { id: 3, name: '最多收藏' },
+  { id: 4, name: '最多评论' }
+];
+
+// 添加响应式状态来跟踪当前选中的按钮
+const activeButton = ref(1); // 默认选中第一个按钮
+
+// 修改点击事件处理函数
+const handleButtonClick = (buttonId) => {
+  activeButton.value = buttonId;
+  console.log(`选中了按钮: ${buttons.find(btn => btn.id === buttonId)?.name}`);
+};
+
+// 文章数据
+const articles = [
+{
+    id: 1,
+    avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
+    nickname: "John Doe",
+    title: "如何学习 Vue 3？",
+    content: "Vue 3 提供了全新的组合式 API，使用它可以更方便地构建复杂组件……",
+    image: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
+    likes: 123,
+    comments: 45,
+    favorites: 67
+  },
+  {
+    id: 2,
+    avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
+    nickname: "Jane Smith",
+    title: "前端开发的 5 大技巧",
+    content: "提升前端开发效率的 5 大技巧，从代码优化到工具选择……",
+    image: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
+    likes: 89,
+    comments: 34,
+    favorites: 22
+  },
+  {
+    id: 3,
+    avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
+    nickname: "CoderX",
+    title: "JavaScript 性能优化指南",
+    content: "在大型项目中，JavaScript 性能优化至关重要，以下是一些核心策略……",
+    image: null,
+    likes: 76,
+    comments: 12,
+    favorites: 34
+  },
+  {
+    id: 4,
+    avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
+    nickname: "CoderX",
+    title: "探索现代 Web 开发趋势",
+    content: "现代 Web 开发趋势涵盖微前端、服务端渲染等技术，这是一次深度分析……",
+    image: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
+    likes: 98,
+    comments: 28,
+    favorites: 49
+  },
+  {
+    id: 5,
+    avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
+    nickname: "DevGuru",
+    title: "构建高效团队的秘密",
+    content: "团队协作对项目成功至关重要，本篇文章提供了一些建议和技巧……",
+    image: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
+    likes: 132,
+    comments: 56,
+    favorites: 87
+  }
+];
 </script>
 
 <style scoped>
@@ -76,7 +192,7 @@ const mockDetails = [
 }
 
 .carousel-item {
-  height: 300px;  /* 与父容器高度相同 */
+  height: 300px; /* 与父容器高度相同 */
   line-height: 300px;
   text-align: center;
   background: #364d79;
@@ -84,7 +200,7 @@ const mockDetails = [
 }
 
 :deep(.slick-slide) {
-  pointer-events: none;  /* 修复可能的点击事件问题 */
+  pointer-events: none; /* 修复可能的点击事件问题 */
 }
 
 :deep(.slick-slide.slick-active) {
@@ -97,6 +213,7 @@ const mockDetails = [
   z-index: 2;
   width: 40px;
   height: 40px;
+
   &::before {
     font-size: 24px;
   }
@@ -104,14 +221,17 @@ const mockDetails = [
 
 :deep(.slick-dots) {
   bottom: 12px;
+
   li {
     button {
       background: #fff;
       opacity: 0.7;
+
       &:hover {
         opacity: 1;
       }
     }
+
     &.slick-active {
       button {
         background: #1890ff;

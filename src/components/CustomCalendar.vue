@@ -1,5 +1,5 @@
 <template>
-  <div class="custom-calendar rounded-2xl bg-white p-4 shadow-lg w-[380px]">
+  <div class="custom-calendar rounded-2xl bg-white p-4 w-[340px]">
     <div class="text-xl font-bold mb-6 text-gray-900 text-left pl-2 pt-4">每日一题</div>    <table class="w-full border-separate border-spacing-0">
       <thead>
         <tr>
@@ -147,7 +147,7 @@ const handleDateClick = (day) => {
 
 <style scoped>
 .custom-calendar {
-  border: 1px solid #e2e8f0;
+  border: none;  /* 移除边框 */
 }
 
 .custom-calendar th {
