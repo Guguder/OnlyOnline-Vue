@@ -3,7 +3,7 @@
     <a-layout style="width: 100%; min-height: 100vh;">
       <a-layout-header :style="headerStyle">
         <div class="header-container">
-          <div class="logo-container">
+          <div class="logo-container" @click="handleLogoClick">
             <img src="/logo.png" alt="logo" />
           </div>
           <div class="menu-container">
@@ -38,7 +38,7 @@ import {
 } from '@ant-design/icons-vue';
 import { useRouter } from 'vue-router';
 
-const current = ref(['home']);
+const current = ref(['/']); // 修改默认选中项为首页
 const items = ref([
   {
     key: '/',           // 修改key与路由路径匹配
@@ -66,6 +66,11 @@ const items = ref([
 const router = useRouter();
 const handleSelect = (key) => {
   router.push(key);
+};
+
+// 添加点击Logo跳转到首页的功能
+const handleLogoClick = () => {
+  router.push('/');
 };
 
 const containerStyle = {

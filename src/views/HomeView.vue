@@ -49,12 +49,12 @@
 
           <!-- 文章列表区域 -->
           <div class="p-5">
-            <div class="grid divide-y divide-gray-200">
+            <div class="grid divide-y divide-gray-200"> <!-- 移除 overflow-hidden -->
               <ArticleCard
-                v-for="article in articles"
-                :key="article.id"
-                :article="article"
-                class="first:pt-0 pt-4"
+                  v-for="article in articles"
+                  :key="article.id"
+                  :article="article"
+                  class="first:pt-0 pt-4"
               />
             </div>
           </div>
@@ -63,7 +63,7 @@
     </div>
     <div class="w-[340px]">
       <div class="sticky top-5 w-full">
-        <div class="w-full border border-[#d9d9d9] rounded-2xl bg-white">
+        <div class="w-full border-[#d9d9d9] rounded-2xl bg-white">
           <CustomCalendar :day-details="mockDetails"/>
         </div>
       </div>
@@ -126,7 +126,7 @@ const articles = [
     avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
     nickname: "John Doe",
     title: "如何学习 Vue 3？",
-    content: "Vue 3 提供了全新的组合式 API，使用它可以更方便地构建复杂组件……",
+    content: "Vue 3 提供了全新的组合式 API，使用它可以更方便地构建复杂组件，Vue 3 提供了全新的组合式 API，使用它可以更方便地构建复杂组件Vue 3 提供了全新的组合式 API，使用它可以更方便地构建复杂组件Vue 3 提供了全新的组合式 API，使用它可以更方便地构建复杂组件Vue 3 提供了全新的组合式 API，使用它可以更方便地构建复杂组件Vue 3 提供了全新的组合式 API，使用它可以更方便地构建复杂组件Vue 3 提供了全新的组合式 API，使用它可以更方便地构建复杂组件",
     image: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
     likes: 123,
     comments: 45,
@@ -137,7 +137,7 @@ const articles = [
     avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
     nickname: "Jane Smith",
     title: "前端开发的 5 大技巧",
-    content: "提升前端开发效率的 5 大技巧，从代码优化到工具选择……",
+    content: "提升前端开发效率的 5 大技巧，从代码优化到工具选择",
     image: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
     likes: 89,
     comments: 34,
@@ -148,7 +148,7 @@ const articles = [
     avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
     nickname: "CoderX",
     title: "JavaScript 性能优化指南",
-    content: "在大型项目中，JavaScript 性能优化至关重要，以下是一些核心策略……",
+    content: "在大型项目中，JavaScript 性能优化至关重要，以下是一些核心策略",
     image: null,
     likes: 76,
     comments: 12,
@@ -159,7 +159,7 @@ const articles = [
     avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
     nickname: "CoderX",
     title: "探索现代 Web 开发趋势",
-    content: "现代 Web 开发趋势涵盖微前端、服务端渲染等技术，这是一次深度分析……",
+    content: "现代 Web 开发趋势涵盖微前端、服务端渲染等技术，这是一次深度分析",
     image: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
     likes: 98,
     comments: 28,
@@ -170,7 +170,7 @@ const articles = [
     avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
     nickname: "DevGuru",
     title: "构建高效团队的秘密",
-    content: "团队协作对项目成功至关重要，本篇文章提供了一些建议和技巧……",
+    content: "团队协作对项目成功至关重要，本篇文章提供了一些建议和技巧",
     image: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png?x-oss-process=image%2Fformat%2Cwebp",
     likes: 132,
     comments: 56,
@@ -276,7 +276,7 @@ const articles = [
 }
 
 .custom-calendar {
-  border: 1px solid #e2e8f0;
+  /* 移除边框样式 */
 }
 
 .custom-calendar th {

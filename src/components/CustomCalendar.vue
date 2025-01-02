@@ -1,5 +1,5 @@
 <template>
-  <div class="custom-calendar rounded-2xl bg-white p-4 w-[340px]">
+  <div class="custom-calendar rounded-2xl bg-white p-4">
     <div class="text-xl font-bold mb-6 text-gray-900 text-left pl-2 pt-4">每日一题</div>    <table class="w-full border-separate border-spacing-0">
       <thead>
         <tr>
@@ -147,7 +147,6 @@ const handleDateClick = (day) => {
 
 <style scoped>
 .custom-calendar {
-  border: none;  /* 移除边框 */
 }
 
 .custom-calendar th {
@@ -163,9 +162,9 @@ const handleDateClick = (day) => {
   padding: 0;  /* 移除默认内边距 */
 }
 
-/* 优化悬浮框样式 */
+/* 修改悬浮框样式，使用更清晰的阴影 */
 .group-hover\:block {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
   display: none;
 }
