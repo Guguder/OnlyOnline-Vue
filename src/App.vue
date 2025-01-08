@@ -23,25 +23,49 @@
           <router-view />
         </div>
       </a-layout-content>
-      <a-layout-footer :style="footerStyle">Footer</a-layout-footer>
+      <a-layout-footer>
+        <Footer></Footer>
+      </a-layout-footer>
     </a-layout>
   </a-space>
 </template>
 
 <script setup>
-import { h, ref } from 'vue';
+import { h, ref, onMounted } from 'vue';
 import { 
   HomeOutlined, 
   BookOutlined, 
   MessageOutlined, 
   InfoCircleOutlined 
 } from '@ant-design/icons-vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
+import Footer from "./components/Footer.vue";
 
-const current = ref(['/']); // 修改默认选中项为首页
+const router = useRouter();
+const route = useRoute();
+
+// 只使用路由路径作为选中项
+const current = ref([]);
+
+// 在组件挂载时同步路由状态
+onMounted(() => {
+  syncMenuWithRoute();
+});
+
+// 同步菜单选中状态与路由
+const syncMenuWithRoute = () => {
+  // 修改判断逻辑
+  current.value = [route.path];
+};
+
+// 监听路由变化，修改判断逻辑
+router.afterEach((to) => {
+  current.value = [to.path];
+});
+
 const items = ref([
   {
-    key: '/',           // 修改key与路由路径匹配
+    key: '/home',
     icon: () => h(HomeOutlined),
     label: '主页',
   },
@@ -63,14 +87,13 @@ const items = ref([
 ]);
 
 // 添加路由监听
-const router = useRouter();
 const handleSelect = (key) => {
   router.push(key);
 };
 
 // 添加点击Logo跳转到首页的功能
 const handleLogoClick = () => {
-  router.push('/');
+  router.push('/home');  // 修改为 /home
 };
 
 const containerStyle = {
@@ -80,49 +103,21 @@ const containerStyle = {
   padding: 0,
 }
 
-const layoutStyle = {
-  height: '100vh',
-}
-
 const headerStyle = {
-  textAlign: 'center',
   color: '#fff',
   height: 64,
   paddingInline: 50,
   lineHeight: '64px',
   backgroundColor: '#fff',
   padding: '0 20px',
-  // borderBottom: '2px solid #ccc',
 };
 
 const contentStyle = {
-  textAlign: 'center',
-  minHeight: 120,
-  lineHeight: '120px',
-  color: '#fff',
-  backgroundColor: '#28A7D5',
-};
-const footerStyle = {
-  textAlign: 'center',
-  color: '#fff',
-  backgroundColor: '#108ee9',
+  backgroundColor: '#F5F5F7',
 };
 </script>
 
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html, body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
+<style >
 .header-container {
   display: flex;
   justify-content: space-between;
@@ -131,29 +126,29 @@ html, body {
   height: 100%;
   margin: 0 auto;
 }
+
 .content-container {
   display: flex;
   justify-content: center;
   align-items: center;
   max-width: 1200px;
-  height: 100%;
   margin: 0 auto;
 }
 
-.header-container .ant-menu {
+.header-container :deep(.ant-menu) {
   flex: 1;
   border: none;
 }
 
 .logo-container {
-  user-select: none;  /* 禁止选中 */
-  -webkit-user-select: none;  /* Safari 支持 */
-  -moz-user-select: none;     /* Firefox 支持 */
-  -ms-user-select: none;      /* IE/Edge 支持 */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 .logo-container img {
-  height: 40px;  /* 可以根据需要调整图片大小 */
+  height: 40px;
   width: auto;
   display: block;
 }
@@ -161,10 +156,10 @@ html, body {
 .menu-container {
   display: flex;
   align-items: center;
-  gap: 20px;  /* 菜单和按钮之间的间距 */
+  gap: 20px;
 }
 
-.menu-container .ant-menu {
+.menu-container :deep(.ant-menu) {
   background: transparent;
   border: none;
   line-height: 64px;
@@ -182,5 +177,20 @@ html, body {
 
 :deep(.ant-menu-item:hover) {
   color: #1890ff !important;
+}
+</style>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 </style>

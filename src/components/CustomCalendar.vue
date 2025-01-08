@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, defineProps } from 'vue';
+import { ref, onMounted, onUnmounted} from 'vue';
 import dayjs from 'dayjs';
 
 // 修改 props 的类型定义

@@ -1,33 +1,39 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import ProblemsView from '../views/ProblemsView.vue'
-import DiscussionView from '../views/DiscussionView.vue'
-import AboutView from '../views/AboutView.vue'
+
+const routes = [
+  {
+    path: '/',
+    redirect: '/home'  // 添加重定向
+  },
+  {
+    path: '/home',     // 添加 home 路由
+    name: 'Home',
+    component: () => import('../views/HomeView.vue'),
+    meta: { menu: '/home' }
+  },
+  {
+    path: '/problems',
+    name: 'Problems',
+    component: () => import('../views/ProblemsView.vue'),
+    meta: { menu: '/problems' }
+  },
+  {
+    path: '/discussion',
+    name: 'Discussion',
+    component: () => import('../views/DiscussionView.vue'),
+    meta: { menu: '/discussion' }
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: () => import('../views/AboutView.vue'),
+    meta: { menu: '/about' }
+  }
+]
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: HomeView
-    },
-    {
-      path: '/problems',
-      name: 'problems',
-      component: ProblemsView
-    },
-    {
-      path: '/discussion',
-      name: 'discussion',
-      component: DiscussionView
-    },
-    {
-      path: '/about',
-      name: 'about',
-      component: AboutView
-    }
-  ]
+  routes
 })
 
 export default router

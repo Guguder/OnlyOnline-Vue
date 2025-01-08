@@ -1,5 +1,5 @@
 <template>
-  <div class="w-screen min-h-screen flex justify-center gap-[20px] mt-[40px] mb-[40px]">
+  <div class="w-screen min-h-screen flex justify-center gap-[20px] mt-[20px] mb-[40px]">
     <div class="w-[840px] flex flex-col gap-5">
       <div class="w-full h-[300px] rounded-2xl overflow-hidden relative">
         <a-carousel arrows autoplay class="h-full">
