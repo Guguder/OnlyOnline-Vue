@@ -110,7 +110,9 @@
               >
             </div>
             <button
-                class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm flex items-center transition-colors">
+              @click="showPublish = true"
+              class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm flex items-center transition-colors"
+            >
               <PencilLine class="h-4 w-4 mr-2"/>
               发起讨论
             </button>
@@ -156,12 +158,18 @@
     </div>
 
     <!-- 右侧登录区域 -->
-    <div class="w-[340px]">
-      <div class="sticky top-5 w-full">
-        <LoginCard/>
+    <div class="w-[340px] flex flex-col gap-5">
+      <LoginCard/>
+      <div class="sticky top-[10px]">
+        <MustReadList :list="mustReadList" />
       </div>
     </div>
   </div>
+
+  <!-- 修改回原来的全屏发布组件 -->
+  <FullscreenModal v-model="showPublish">
+    <PublishArticleView @close="showPublish = false"/>
+  </FullscreenModal>
 </template>
 
 <script setup>
@@ -181,6 +189,9 @@ import {
 import TopicListButton from "../components/TopicListButton.vue";
 import {Tag as ATag} from 'ant-design-vue'
 import FilterTags from '../components/FilterTags.vue'
+import MustReadList from '../components/MustReadList.vue'
+import FullscreenModal from '../components/FullscreenModal.vue'
+import PublishArticleView from './PublishArticleView.vue'  // 恢复这个导入
 
 const selectedCard = ref(null)
 
@@ -261,6 +272,80 @@ const articles = ref([
     views: 3500,
     comments: 120,
     stars: 89
+  },
+  {
+    "id": 3,
+    "avatar": "https://pic.leetcode.cn/1699000395-IIuoAA-%E5%88%B6%E4%BD%9C%E7%81%B0%E8%89%B2%E8%83%8C%E6%99%AF.png",
+    "title": "干货 | JS性能优化技巧总结",
+    "content": "分享一些在项目中使用的JavaScript性能优化技巧，包括代码分片、懒加载等，希望能提高大家的代码效率。",
+    "tags": [
+      {"text": "性能优化", "color": "red"},
+      {"text": "前端", "color": "orange"}
+    ],
+    "likes": 68,
+    "views": 4200,
+    "comments": 85,
+    "stars": 120
+  },
+  {
+    "id": 4,
+    "avatar": "https://pic.leetcode.cn/1699000423-IIuoHH-%E7%AE%80%E6%B4%81%E5%AE%8C%E6%95%B4.png",
+    "title": "总结 | Vue3 Composition API 核心用法",
+    "content": "学习了Vue3 Composition API的基本用法，并总结了其中一些值得注意的点，希望对学习Vue的同学有所帮助。",
+    "tags": [
+      {"text": "Vue3", "color": "blue"},
+      {"text": "前端", "color": "orange"},
+      {"text": "经验分享", "color": "green"}
+    ],
+    "likes": 102,
+    "views": 6800,
+    "comments": 134,
+    "stars": 210
+  },
+  {
+    "id": 5,
+    "avatar": "https://pic.leetcode.cn/1699000447-IIuoBB-%E5%B0%8F%E5%8C%85%E6%94%BB%E7%95%A5.png",
+    "title": "教程 | 手把手带你实现拖拽组件",
+    "content": "最近实现了一个拖拽组件，在实现过程中踩了一些坑，这篇文章详细讲解了组件的核心逻辑及实现细节。",
+    "tags": [
+      {"text": "组件开发", "color": "purple"},
+      {"text": "前端", "color": "orange"},
+      {"text": "实践分享", "color": "teal"}
+    ],
+    "likes": 79,
+    "views": 5600,
+    "comments": 95,
+    "stars": 140
+  },
+  {
+    "id": 6,
+    "avatar": "https://pic.leetcode.cn/1699000470-IIuoCC-%E7%A7%BB%E5%8A%A8%E9%80%9F%E5%8A%9B.png",
+    "title": "学习笔记 | React性能优化方法论",
+    "content": "记录React项目中的性能优化过程，包括如何减少组件重渲染、虚拟化列表、useMemo和useCallback的合理使用等。",
+    "tags": [
+      {"text": "React", "color": "cyan"},
+      {"text": "性能优化", "color": "red"},
+      {"text": "前端", "color": "orange"}
+    ],
+    "likes": 56,
+    "views": 3900,
+    "comments": 75,
+    "stars": 100
+  },
+  {
+    "id": 7,
+    "avatar": "https://pic.leetcode.cn/1699000503-IIuoDD-%E6%B5%85%E8%88%BD%E8%AF%BE%E5%A0%82.png",
+    "title": "盘点 | JavaScript中你可能忽略的陷阱",
+    "content": "JavaScript是一门非常灵活的语言，也存在许多容易忽略的陷阱，这篇文章列举了一些常见问题及解决方案。",
+    "tags": [
+      {"text": "JavaScript", "color": "yellow"},
+      {"text": "前端", "color": "orange"},
+      {"text": "实战", "color": "lime"}
+    ],
+    "likes": 90,
+    "views": 6100,
+    "comments": 108,
+    "stars": 160
   }
 ]);
 
@@ -311,6 +396,51 @@ const toggleExpand = () => {
   isExpanded.value = !isExpanded.value;
 };
 
+// 修改必读榜假数据
+const mustReadList = ref([
+  {
+    id: 1,
+    avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
+    title: '2024年前端面试路线图',
+    views: 12000,
+    likes: 3200,
+    isRead: false
+  },
+  {
+    id: 2,
+    avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
+    title: 'Vue3 + TypeScript 完整项目实战',
+    views: 8500,
+    likes: 2100,
+    isRead: true
+  },
+  {
+    id: 3,
+    avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
+    title: '零基础入门算法 - 系列教程',
+    views: 7800,
+    likes: 1900,
+    isRead: false
+  },
+  {
+    id: 4,
+    avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
+    title: '后端开发必学的设计模式',
+    views: 6500,
+    likes: 1500,
+    isRead: true
+  },
+  {
+    id: 5,
+    avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
+    title: '深入理解 React 原理',
+    views: 5900,
+    likes: 1300,
+    isRead: false
+  }
+])
+
+const showPublish = ref(false)
 </script>
 
 <style scoped>

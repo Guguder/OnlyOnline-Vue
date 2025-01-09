@@ -28,6 +28,16 @@ const routes = [
     name: 'About',
     component: () => import('../views/AboutView.vue'),
     meta: { menu: '/about' }
+  },
+  {
+    path: '/article/:id',
+    name: 'ArticleDetail',
+    component: () => import('../views/ArticleDetailView.vue')
+  },
+  // 添加通配符路由在最后
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/home'
   }
 ]
 

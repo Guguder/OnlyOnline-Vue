@@ -7,6 +7,7 @@
           :key="tag.text"
           :color="selectedTags.includes(tag) ? tag.color : undefined"
           class="cursor-pointer whitespace-nowrap mb-3"
+          :class="{ 'tag-selected': isSelected(tag) }"
           @click="handleTagClick(tag)"
         >
           {{ tag.text }}
@@ -20,6 +21,10 @@
 import { ref } from 'vue'
 import { Tag as ATag } from 'ant-design-vue'
 
+
+const isSelected = (tag) => {
+  return selectedTags.value.some(t => t.text === tag.text);
+};
 const props = defineProps({
   tags: {
     type: Array,
@@ -52,4 +57,10 @@ const handleTagClick = (tag) => {
 .ant-tag:hover {
   opacity: 0.8;
 }
+
+.tag-selected {
+  border-color: #ff0000 !important;
+  border: 1px solid;
+}
+
 </style>
