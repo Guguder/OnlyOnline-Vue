@@ -61,7 +61,7 @@
 <script setup>
 import { Tag as ATag } from 'ant-design-vue'
 import { ThumbsUp, Eye, MessageCircle, Star } from 'lucide-vue-next'
-import { formatNumber } from '../utils/format'
+import { formatNumber } from '../../utils/format.js'
 
 defineProps({
   post: {

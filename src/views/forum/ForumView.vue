@@ -110,7 +110,6 @@
               >
             </div>
             <button
-              @click="showPublish = true"
               class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm flex items-center transition-colors"
             >
               <PencilLine class="h-4 w-4 mr-2"/>
@@ -166,16 +165,18 @@
     </div>
   </div>
 
-  <!-- 修改回原来的全屏发布组件 -->
-  <FullscreenModal v-model="showPublish">
-    <PublishArticleView @close="showPublish = false"/>
-  </FullscreenModal>
+  <!-- 删除这部分 -->
+  <!-- <FullscreenModal v-model="showPublish">
+    <div class="max-w-[1000px] mx-auto">
+      <PublishArticleView @close="showPublish = false"/>
+    </div>
+  </FullscreenModal> -->
 </template>
 
 <script setup>
 import {ref, computed, onMounted, nextTick, watch, onUnmounted} from 'vue'
-import LoginCard from '../components/LoginCard.vue'
-import PostCard from '../components/PostCard.vue'
+import LoginCard from '../../components/forum/NowLoginCard.vue'
+import PostCard from '../../components/forum/PostCard.vue'
 import {
   FileText,
   Users,
@@ -186,12 +187,13 @@ import {
   PencilLine,
   ChevronDown
 } from 'lucide-vue-next'
-import TopicListButton from "../components/TopicListButton.vue";
+import TopicListButton from "../../components/topics/TopicListButton.vue";
 import {Tag as ATag} from 'ant-design-vue'
-import FilterTags from '../components/FilterTags.vue'
-import MustReadList from '../components/MustReadList.vue'
-import FullscreenModal from '../components/FullscreenModal.vue'
-import PublishArticleView from './PublishArticleView.vue'  // 恢复这个导入
+import FilterTags from '../../components/forum/TagList.vue'
+import MustReadList from '../../components/forum/MustReadList.vue'
+// 删除这两个导入
+// import FullscreenModal from '../components/FullscreenModal.vue'
+// import PublishArticleView from './PublishArticleView.vue'
 
 const selectedCard = ref(null)
 
@@ -440,7 +442,6 @@ const mustReadList = ref([
   }
 ])
 
-const showPublish = ref(false)
 </script>
 
 <style scoped>

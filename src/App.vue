@@ -70,12 +70,12 @@ const items = ref([
     label: '主页',
   },
   {
-    key: '/problems',   // 修改key与路由路径匹配
+    key: '/topics',   // 修改key与路由路径匹配
     icon: () => h(BookOutlined),
     label: '题库',
   },
   {
-    key: '/discussion', // 修改key与路由路径匹配
+    key: '/forum', // 修改key与路由路径匹配
     icon: () => h(MessageOutlined),
     label: '讨论',
   },

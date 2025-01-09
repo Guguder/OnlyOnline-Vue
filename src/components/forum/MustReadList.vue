@@ -59,7 +59,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { formatNumber } from '../utils/format'  // 导入格式化函数
+import { formatNumber } from '../../utils/format.js'  // 导入格式化函数
 import { useRouter } from 'vue-router'
 
 const props = defineProps({

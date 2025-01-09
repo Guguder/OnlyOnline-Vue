@@ -8,31 +8,31 @@ const routes = [
   {
     path: '/home',     // 添加 home 路由
     name: 'Home',
-    component: () => import('../views/HomeView.vue'),
+    component: () => import('../views/home/HomeView.vue'),
     meta: { menu: '/home' }
   },
   {
-    path: '/problems',
-    name: 'Problems',
-    component: () => import('../views/ProblemsView.vue'),
-    meta: { menu: '/problems' }
+    path: '/topics',
+    name: 'Topics',
+    component: () => import('../views/topics/TopicsView.vue'),
+    meta: { menu: '/topics' }
   },
   {
-    path: '/discussion',
-    name: 'Discussion',
-    component: () => import('../views/DiscussionView.vue'),
-    meta: { menu: '/discussion' }
+    path: '/forum',
+    name: 'Forum',
+    component: () => import('../views/forum/ForumView.vue'),
+    meta: { menu: '/forum' }
   },
   {
     path: '/about',
     name: 'About',
-    component: () => import('../views/AboutView.vue'),
+    component: () => import('../views/orther/AboutView.vue'),
     meta: { menu: '/about' }
   },
   {
-    path: '/article/:id',
-    name: 'ArticleDetail',
-    component: () => import('../views/ArticleDetailView.vue')
+    path: '/post/:id',
+    name: 'PostDetail',
+    component: () => import('../views/topics/PostDetailView.vue')
   },
   // 添加通配符路由在最后
   {

@@ -36,7 +36,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { Eye, ThumbsUp } from 'lucide-vue-next'
-import { formatNumber } from '../utils/format'
+import { formatNumber } from '../../utils/format.js'
 
 const route = useRoute()
 const articleId = route.params.id

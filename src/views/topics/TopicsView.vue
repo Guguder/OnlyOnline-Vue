@@ -120,10 +120,10 @@
 </template>
 
 <script setup>
-import TopicListButton from "../components/TopicListButton.vue";
-import QuestionBank from "../components/QuestionBank.vue";
-import RankingList from "../components/RankingList.vue";
-import ProblemList from "../components/ProblemList.vue";
+import TopicListButton from "../../components/topics/TopicListButton.vue";
+import QuestionBank from "../../components/topics/TopicsBank.vue";
+import RankingList from "../../components/forum/RankingList.vue";
+import ProblemList from "../../components/topics/TopicList.vue";
 import {
   Search,
   Shuffle,
