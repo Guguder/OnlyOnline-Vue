@@ -14,7 +14,7 @@
                 :items="items"
                 @select="({ key }) => handleSelect(key)"
             />
-            <a-button>登录</a-button>
+            <a-button @click="showLoginModal">登录</a-button>
           </div>
         </div>
       </a-layout-header>
@@ -27,6 +27,7 @@
         <Footer></Footer>
       </a-layout-footer>
     </a-layout>
+    <login-modal />
   </a-space>
 </template>
 
@@ -40,6 +41,8 @@ import {
 } from '@ant-design/icons-vue';
 import { useRouter, useRoute } from 'vue-router';
 import Footer from "./components/Footer.vue";
+import LoginModal from "./components/auth/LoginModal.vue";
+import { useLoginModal } from './stores/useLoginModal'
 
 const router = useRouter();
 const route = useRoute();
@@ -95,6 +98,9 @@ const handleSelect = (key) => {
 const handleLogoClick = () => {
   router.push('/home');  // 修改为 /home
 };
+
+// 登录模态框引用
+const { showLoginModal } = useLoginModal()
 
 const containerStyle = {
   width: '100%',

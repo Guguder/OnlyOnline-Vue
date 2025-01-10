@@ -110,7 +110,8 @@
               >
             </div>
             <button
-              class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm flex items-center transition-colors"
+                @click="showPostModal = true"
+                class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm flex items-center transition-colors"
             >
               <PencilLine class="h-4 w-4 mr-2"/>
               发起讨论
@@ -120,23 +121,23 @@
 
         <!-- 修改标签筛选区域 -->
         <div class="flex flex-wrop px-2 py-3 border-b border-gray-100">
-          <div class="max-w-[800px] transition-all duration-500 ease-in-out" 
+          <div class="max-w-[800px] transition-all duration-500 ease-in-out"
                :style="{ 
                  maxHeight: isExpanded ? '800px' : '42px',
                  opacity: isExpanded ? '1' : '0.95',
                }"
                style="overflow: hidden;">
             <FilterTags
-              :tags="filterTags"
-              v-model:selectedTags="selectedTags"
-              :is-expanded="isExpanded"
+                :tags="filterTags"
+                v-model:selectedTags="selectedTags"
+                :is-expanded="isExpanded"
             />
           </div>
           <div class="py-3 pr-4">
-            <ChevronDown 
-              @click="toggleExpand"
-              class="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600 transition-all duration-500" 
-              :class="{ 'transform rotate-180': isExpanded }"
+            <ChevronDown
+                @click="toggleExpand"
+                class="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600 transition-all duration-500"
+                :class="{ 'transform rotate-180': isExpanded }"
             />
           </div>
         </div>
@@ -160,17 +161,100 @@
     <div class="w-[340px] flex flex-col gap-5">
       <LoginCard/>
       <div class="sticky top-[10px]">
-        <MustReadList :list="mustReadList" />
+        <MustReadList :list="mustReadList"/>
       </div>
     </div>
   </div>
 
-  <!-- 删除这部分 -->
-  <!-- <FullscreenModal v-model="showPublish">
-    <div class="max-w-[1000px] mx-auto">
-      <PublishArticleView @close="showPublish = false"/>
+  <!-- 修改模态框使用方式 -->
+  <PostModal v-model="showPostModal">
+    <div class="space-y-6">
+      <!-- 标题输入框 - 更新样式 -->
+      <div class="flex flex-col gap-2 relative">
+        <input
+            type="text"
+            v-model="postTitle"
+            maxlength="20"
+            placeholder="此处输入标题"
+            class="w-full py-2 text-base font-medium border-0 focus:outline-none"
+            @focus="isTitleFocused = true"
+            @blur="isTitleFocused = false"
+        />
+        <!-- 底部线条容器 -->
+        <div class="relative h-[1px] bg-gray-200 overflow-hidden">
+          <!-- 动画线条 -->
+          <div
+              class="absolute inset-x-1/2 h-[2px] bg-purple-500 transition-all duration-300 ease-out"
+              :class="{ 'inset-x-0': isTitleFocused }"
+          ></div>
+        </div>
+      </div>
+
+      <!-- 修改导航按钮和标签搜索区域的布局 -->
+      <div class="flex flex-col gap-4">
+        <!-- 第一行：所属话题和标签搜索 -->
+        <div class="flex items-start gap-4">
+          <TopicListButton
+              text="所属话题"
+              :options="postCategoryOptions"
+              :isOpen="currentOpenDropdown === 'postCategory'"
+              @toggle="handleDropdownToggle('postCategory')"
+              @select="handlePostCategorySelect"
+          />
+
+          <!-- 标签搜索输入框，与所属话题对齐 -->
+          <div class="w-[120px] relative tag-search-container">
+            <div class="relative">
+              <input
+                  v-model="tagSearchQuery"
+                  placeholder="搜索标签..."
+                  class="w-full px-3 py-2 bg-gray-50 rounded-lg text-sm border border-gray-200 focus:outline-none focus:border-purple-500"
+                  @focus="isTagSearchFocused = true"
+              />
+              <!-- 添加清空按钮 -->
+              <button
+                  v-show="tagSearchQuery"
+                  @click="clearTagSearch"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X class="w-4 h-4"/>
+              </button>
+            </div>
+
+            <!-- 修改标签搜索下拉列表部分 -->
+            <div v-if="isTagSearchFocused && filteredTags.length > 0"
+                 class="absolute left-0 right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 max-h-[200px] overflow-y-auto z-50">
+              <div v-for="tag in filteredTags"
+                   :key="tag.value"
+                   @click.stop="addTag(tag)"
+                   class="px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm">
+                {{ tag.label }}
+              </div>
+            </div>
+          </div>
+          <div class="relative flex items-center h-[36px]">
+            <!-- 已选标签展示 -->
+            <div class="flex flex-wrap gap-4 justify-center "> <!-- 对齐输入框右侧 -->
+              <div v-for="tag in selectedSearchTags"
+                   :key="tag.value"
+                   class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded text-sm">
+                {{ tag.label }}
+                <button @click="removeTag(tag)"
+                        class="hover:text-blue-800">
+                  <X class="w-3 h-3"/>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div >
+        <Vditor>
+        </Vditor>
+      </div>
     </div>
-  </FullscreenModal> -->
+  </PostModal>
+
 </template>
 
 <script setup>
@@ -185,15 +269,13 @@ import {
   PenLine,
   Search,
   PencilLine,
-  ChevronDown
+  ChevronDown,
+  X
 } from 'lucide-vue-next'
 import TopicListButton from "../../components/topics/TopicListButton.vue";
-import {Tag as ATag} from 'ant-design-vue'
 import FilterTags from '../../components/forum/TagList.vue'
 import MustReadList from '../../components/forum/MustReadList.vue'
-// 删除这两个导入
-// import FullscreenModal from '../components/FullscreenModal.vue'
-// import PublishArticleView from './PublishArticleView.vue'
+import PostModal from '../../components/forum/PostModal.vue'
 
 const selectedCard = ref(null)
 
@@ -442,6 +524,102 @@ const mustReadList = ref([
   }
 ])
 
+// 添加模态框控制状态
+const showPostModal = ref(false)
+
+// 添加文章分类和类型选项
+const postCategoryOptions = ref([
+  {label: '求职面试', value: 'job'},
+  {label: '技术交流', value: 'tech'},
+  {label: '学习分享', value: 'study'},
+  {label: '意见反馈', value: 'feedback'},
+]);
+
+const currentOpenDropdown = ref(null);
+
+const handleDropdownToggle = (dropdownId) => {
+  currentOpenDropdown.value = currentOpenDropdown.value === dropdownId ? null : dropdownId;
+};
+
+const handlePostCategorySelect = (item) => {
+  console.log('所属话题:', item);
+};
+
+// 标题输入框焦点状态
+const isTitleFocused = ref(false);
+const postTitle = ref('');
+
+// 标签搜索相关
+const tagSearchQuery = ref('');
+const isTagSearchFocused = ref(false);
+const selectedSearchTags = ref([]);
+
+// 标签选项
+const allTags = ref([
+  {label: 'JavaScript', value: 'js'},
+  {label: 'Vue', value: 'vue'},
+  {label: 'React', value: 'react'},
+  {label: '前端开发', value: 'frontend'},
+  {label: '后端开发', value: 'backend'},
+  {label: '算法', value: 'algorithm'},
+  // ... 更多标签
+]);
+
+// 过滤标签 - 修改计算属性
+const filteredTags = computed(() => {
+  if (!tagSearchQuery.value) {
+    // 当搜索框为空时，返回所有未选择的标签
+    return allTags.value.filter(tag => 
+      !selectedSearchTags.value.some(selected => selected.value === tag.value)
+    );
+  }
+  // 当有搜索内容时，在未选择的标签中进行搜索
+  return allTags.value.filter(tag => 
+    tag.label.toLowerCase().includes(tagSearchQuery.value.toLowerCase()) &&
+    !selectedSearchTags.value.some(selected => selected.value === tag.value)
+  );
+});
+
+// 修改添加标签的逻辑,移除对isTagSearchFocused的操作
+const addTag = (tag) => {
+  if (selectedSearchTags.value.length < 8) {
+    selectedSearchTags.value.push(tag);
+    tagSearchQuery.value = '';
+    // 添加这一行来保持输入框的焦点
+    document.querySelector('input[placeholder="搜索标签..."]')?.focus();
+  }
+};
+
+// 修改移除标签的逻辑，移除焦点相关代码
+const removeTag = (tag) => {
+  selectedSearchTags.value = selectedSearchTags.value.filter(t => t.value !== tag.value);
+};
+
+// 添加清空搜索功能
+const clearTagSearch = () => {
+  tagSearchQuery.value = '';
+  // 保持焦点状态，这样下拉框不会关闭
+  document.querySelector('input[placeholder="搜索标签..."]')?.focus();
+};
+
+// 添加点击外部关闭下拉框的处理函数
+const handleClickOutside = (event) => {
+  const tagSearchContainer = document.querySelector('.tag-search-container');
+  if (tagSearchContainer && !tagSearchContainer.contains(event.target)) {
+    isTagSearchFocused.value = false;
+  }
+};
+
+// 在组件挂载时添加点击事件监听
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+});
+
+// 在组件卸载时移除点击事件监听
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
+
 </script>
 
 <style scoped>
@@ -533,7 +711,6 @@ const mustReadList = ref([
 
 /* 添加标签悬停效果和圆角 */
 :deep(.ant-tag) {
-  border-radius: 10px;
   padding: 0 10px;
   margin-right: 0; /* 覆盖 ant-design-vue 的默认外边距 */
   margin-bottom: 0; /* 覆盖 ant-design-vue 的默认外边距 */
@@ -550,6 +727,20 @@ const mustReadList = ref([
 
 /* 优化过渡动画 */
 .transition-all {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 添加输入框动画相关样式 */
+.title-input-container {
+  position: relative;
+}
+
+.focus-line {
+  transform-origin: center;
+}
+
+/* 修改动画线条的过渡效果 */
+.bg-purple-500 {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 </style>

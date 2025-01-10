@@ -26,7 +26,7 @@ const routes = [
   {
     path: '/about',
     name: 'About',
-    component: () => import('../views/orther/AboutView.vue'),
+    component: () => import('../views/other/AboutView.vue'),
     meta: { menu: '/about' }
   },
   {

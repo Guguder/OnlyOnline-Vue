@@ -16,6 +16,7 @@
             v-for="tag in post.tags"
             :key="tag.text"
             :color="tag.color"
+            style="margin-right: 8px;"
           >
             {{ tag.text }}
           </a-tag>
@@ -86,10 +87,5 @@ p {
   word-wrap: break-word;
   word-break: break-word;
   hyphens: auto;
-}
-
-:deep(.ant-tag) {
-  border-radius: 10px;
-  padding: 0 10px;
 }
 </style>

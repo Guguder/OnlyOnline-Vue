@@ -6,12 +6,18 @@
     </div>
     
     <div class="flex flex-col gap-4">
-      <a-button type="primary" class="h-10" block>
+      <a-button type="primary" class="h-10" block @click="showLoginModal">
         立即登录
       </a-button>
       <p class="text-xs text-gray-500 text-center">
-        还没有账号？<a href="#" class="text-blue-500 hover:text-blue-600">立即注册</a>
+        还没有账号？<a href="#" class="text-blue-500 hover:text-blue-600" @click.prevent="showLoginModal">立即注册</a>
       </p>
     </div>
   </div>
 </template>
+
+<script setup>
+import { useLoginModal } from '../../stores/useLoginModal'
+
+const { showLoginModal } = useLoginModal()
+</script>

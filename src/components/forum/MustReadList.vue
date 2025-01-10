@@ -37,7 +37,7 @@
         </div>
         
         <!-- 内容区 -->
-        <div class="flex-1 min-w-0" @click="goToArticle(item.id)">
+        <div class="flex-1 min-w-0" @click="goToPost(item.id)">
           <h3 class="text-sm font-medium text-gray-900 truncate group-hover:text-purple-500 cursor-pointer">
             {{ item.title }}
           </h3>
@@ -90,8 +90,8 @@ const currentPeriod = ref('day')
 
 const router = useRouter()
 
-const goToArticle = (id) => {
-  router.push(`/article/${id}`)
+const goToPost = (id) => {
+  router.push(`/post/${id}`)
 }
 </script>
 

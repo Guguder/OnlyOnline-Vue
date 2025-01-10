@@ -47,13 +47,6 @@ const handleTagClick = (tag) => {
 </script>
 
 <style scoped>
-:deep(.ant-tag) {
-  border-radius: 10px;
-  padding: 0 10px;
-  margin-right: 0;
-  margin-bottom: 0;
-}
-
 .ant-tag:hover {
   opacity: 0.8;
 }
