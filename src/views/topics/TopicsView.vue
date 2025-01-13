@@ -51,40 +51,40 @@
         <!-- 子导航 -->
         <div class="flex flex-wrap items-center mt-4 gap-2">
           <div class="flex-none">
-            <TopicListButton 
-              text="题单" 
-              :options="questionSetOptions"
-              :isOpen="currentOpenDropdown === 'questionSet'"
-              @toggle="handleDropdownToggle('questionSet')"
-              @select="handleQuestionSetSelect"
+            <TopicListButton
+                text="题单"
+                :options="questionSetOptions"
+                :isOpen="currentOpenDropdown === 'questionSet'"
+                @toggle="handleDropdownToggle('questionSet')"
+                @select="handleQuestionSetSelect"
             />
           </div>
           <div class="flex-none">
-            <TopicListButton 
-              text="难度" 
-              :options="difficultyOptions"
-              :isOpen="currentOpenDropdown === 'difficulty'"
-              v-model="selectedDifficulty"
-              @toggle="handleDropdownToggle('difficulty')"
-              @select="handleDifficultySelect"
+            <TopicListButton
+                text="难度"
+                :options="difficultyOptions"
+                :isOpen="currentOpenDropdown === 'difficulty'"
+                v-model="selectedDifficulty"
+                @toggle="handleDropdownToggle('difficulty')"
+                @select="handleDifficultySelect"
             />
           </div>
           <div class="flex-none">
-            <TopicListButton 
-              text="状态" 
-              :options="statusOptions"
-              :isOpen="currentOpenDropdown === 'status'"
-              @toggle="handleDropdownToggle('status')"
-              @select="handleStatusSelect"
+            <TopicListButton
+                text="状态"
+                :options="statusOptions"
+                :isOpen="currentOpenDropdown === 'status'"
+                @toggle="handleDropdownToggle('status')"
+                @select="handleStatusSelect"
             />
           </div>
           <div class="flex-none">
-            <TopicListButton 
-              text="标签" 
-              :options="tagOptions"
-              :isOpen="currentOpenDropdown === 'tag'"
-              @toggle="handleDropdownToggle('tag')"
-              @select="handleTagSelect"
+            <TopicListButton
+                text="标签"
+                :options="tagOptions"
+                :isOpen="currentOpenDropdown === 'tag'"
+                @toggle="handleDropdownToggle('tag')"
+                @select="handleTagSelect"
             />
           </div>
           <div class="flex-1 min-w-[200px]">
@@ -253,32 +253,32 @@ const navItems = [
 
 // 下拉菜单选项数据
 const questionSetOptions = ref([
-  { label: '热门 TOP 100', value: 'hot100' },
-  { label: '精选 TOP 面试题', value: 'interview' },
-  { label: 'LeetCode 精选', value: 'leetcode' },
+  {label: '热门 TOP 100', value: 'hot100'},
+  {label: '精选 TOP 面试题', value: 'interview'},
+  {label: 'LeetCode 精选', value: 'leetcode'},
 ]);
 
 const difficultyOptions = ref([
-  { label: '简单', value: 'easy' },
-  { label: '中等', value: 'medium' },
-  { label: '困难', value: 'hard' },
+  {label: '简单', value: 'easy'},
+  {label: '中等', value: 'medium'},
+  {label: '困难', value: 'hard'},
 ]);
 
 const statusOptions = ref([
-  { label: '已解答', value: 'solved' },
-  { label: '未开始', value: 'todo' },
-  { label: '尝试过', value: 'attempted' },
+  {label: '已解答', value: 'solved'},
+  {label: '未开始', value: 'todo'},
+  {label: '尝试过', value: 'attempted'},
 ]);
 
 // const tagOptions = ref([
 // ]);
 
 const tagOptions = ref([
-  { label: '数组', value: 'array' },
-  { label: '字符串', value: 'string' },
-  { label: '动态规划', value: 'dp' },
-  { label: '树', value: 'tree' },
-  { label: '贪心', value: 'greedy' },
+  {label: '数组', value: 'array'},
+  {label: '字符串', value: 'string'},
+  {label: '动态规划', value: 'dp'},
+  {label: '树', value: 'tree'},
+  {label: '贪心', value: 'greedy'},
 ]);
 
 // 处理选择事件

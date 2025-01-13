@@ -7,25 +7,25 @@ const routes = [
   },
   {
     path: '/home',     // 添加 home 路由
-    name: 'Home',
+    name: 'home',
     component: () => import('../views/home/HomeView.vue'),
     meta: { menu: '/home' }
   },
   {
     path: '/topics',
-    name: 'Topics',
+    name: 'topics',
     component: () => import('../views/topics/TopicsView.vue'),
     meta: { menu: '/topics' }
   },
   {
     path: '/forum',
-    name: 'Forum',
+    name: 'forum',
     component: () => import('../views/forum/ForumView.vue'),
     meta: { menu: '/forum' }
   },
   {
     path: '/about',
-    name: 'About',
+    name: 'about',
     component: () => import('../views/other/AboutView.vue'),
     meta: { menu: '/about' }
   },

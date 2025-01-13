@@ -15,7 +15,6 @@ export const useLoginModalStore = defineStore('loginModal', {
   },
 });
 
-// 创建一个组合式函数便于使用
 export const useLoginModal = () => {
   const loginModalStore = useLoginModalStore();
   

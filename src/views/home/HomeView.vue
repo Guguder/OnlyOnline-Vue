@@ -64,7 +64,10 @@
     <div class="w-[340px]">
       <div class="sticky top-5 w-full">
         <div class="w-full border-[#d9d9d9] rounded-2xl bg-white">
-          <CustomCalendar :day-details="mockDetails"/>
+          <CustomCalendar 
+            :day-details="mockDetails"
+            :completion-data="completionData"
+          />
         </div>
       </div>
     </div>
@@ -177,6 +180,23 @@ const articles = [
     favorites: 87
   }
 ];
+
+// 添加完成情况数据
+const completionData = [
+  {
+    Date: "2025-01-01",
+    isDo: "true"
+  },
+  {
+    Date: "2025-01-02",
+    isDo: "true"
+  },
+  {
+    Date: "2025-01-13",
+    isDo: "true"
+  }
+];
+
 </script>
 
 <style scoped>

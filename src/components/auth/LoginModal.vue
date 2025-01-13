@@ -3,108 +3,99 @@
     v-model:show="isVisible"
     :mask-closable="false"
     preset="dialog"
-    style="width: 400px"
+    style="width: 400px; border-radius: 12px;"
     :show-icon="false"
+    transform-origin="center"
+    class="modal-transform custom-modal"
   >
-    <div class="p-4">
+    <div class="p-8">
       <!-- 标题区域 -->
-      <div class="text-center mb-6">
-        <h2 class="text-2xl font-bold">{{ isLogin ? '欢迎回来' : '创建账号' }}</h2>
-        <p class="text-gray-500 mt-2">{{ isLogin ? '登录你的账号继续' : '快速注册开始体验' }}</p>
+      <div class="text-center mb-8">
+        <h2 class="text-2xl font-semibold text-primary-900">{{ isLogin ? '欢迎回来' : '创建账号' }}</h2>
+        <p class="text-gray-500 mt-2 text-sm">{{ isLogin ? '登录你的账号继续' : '快速注册开始体验' }}</p>
       </div>
 
       <!-- 表单区域 -->
-      <n-form
+      <a-form
         ref="formRef"
         :model="formData"
-        @submit.prevent="handleSubmit"
+        @finish="handleSubmit"
       >
-        <n-form-item
-          label="用户名"
-          path="username"
-          :rule="{
-            required: true,
-            message: '请输入用户名'
-          }"
+        <a-form-item
+          name="username"
+          :rules="[{ required: true, message: '请输入用户名' }]"
         >
-          <n-input
+          <a-input
             v-model:value="formData.username"
             placeholder="请输入用户名"
+            size="large"
           >
             <template #prefix>
-              <User class="h-5 w-5 text-gray-400" />
+              <UserOutlined class="site-form-item-icon" />
             </template>
-          </n-input>
-        </n-form-item>
+          </a-input>
+        </a-form-item>
 
-        <n-form-item
-          label="密码"
-          path="password"
-          :rule="{
-            required: true,
-            message: '请输入密码'
-          }"
+        <a-form-item
+          name="password"
+          :rules="[{ required: true, message: '请输入密码' }]"
         >
-          <n-input
+          <a-input-password
             v-model:value="formData.password"
-            type="password"
             placeholder="请输入密码"
+            size="large"
           >
             <template #prefix>
-              <Lock class="h-5 w-5 text-gray-400" />
+              <LockOutlined class="site-form-item-icon" />
             </template>
-          </n-input>
-        </n-form-item>
+          </a-input-password>
+        </a-form-item>
 
-        <n-form-item
+        <a-form-item
           v-if="!isLogin"
-          label="确认密码"
-          path="confirmPassword"
-          :rule="{
-            required: true,
-            validator: validateConfirmPassword,
-            message: '两次输入的密码不一致'
-          }"
+          name="confirmPassword"
+          :rules="[
+            { required: true, message: '请确认密码' },
+            { validator: validateConfirmPassword }
+          ]"
         >
-          <n-input
+          <a-input-password
             v-model:value="formData.confirmPassword"
-            type="password"
             placeholder="请确认密码"
+            size="large"
           >
             <template #prefix>
-              <Lock class="h-5 w-5 text-gray-400" />
+              <LockOutlined class="site-form-item-icon" />
             </template>
-          </n-input>
-        </n-form-item>
+          </a-input-password>
+        </a-form-item>
 
-        <div class="mt-6">
-          <n-button
+        <a-form-item>
+          <a-button
             type="primary"
-            block
+            html-type="submit"
             :loading="loading"
-            @click="handleSubmit"
+            block
+            size="large"
           >
             {{ isLogin ? '登录' : '注册' }}
-          </n-button>
-        </div>
-      </n-form>
+          </a-button>
+        </a-form-item>
 
-      <!-- 切换登录/注册 -->
-      <div class="text-center mt-4">
-        <n-button
-          text
-          @click="toggleMode"
-        >
-          {{ isLogin ? '还没有账号？点击注册' : '已有账号？点击登录' }}
-        </n-button>
-      </div>
+        <!-- 切换登录/注册 -->
+        <div class="text-center">
+          <a-button type="link" @click="toggleMode">
+            {{ isLogin ? '还没有账号？点击注册' : '已有账号？点击登录' }}
+          </a-button>
+        </div>
+      </a-form>
     </div>
   </n-modal>
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
-import { User, Lock } from 'lucide-vue-next'
+import { ref, reactive, computed, watch } from 'vue'
+import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
 import { useAuthStore } from '../../stores/auth'
 import { useLoginModalStore } from '../../stores/useLoginModal'
 
@@ -116,6 +107,7 @@ const isVisible = computed({
     if (!value) loginModalStore.hide()
   }
 })
+
 const isLogin = ref(true)
 const loading = ref(false)
 
@@ -127,12 +119,12 @@ const formData = reactive({
 
 // 验证确认密码
 const validateConfirmPassword = async (rule, value) => {
-  if (value !== formData.password) {
+  if (value && value !== formData.password) {
     throw new Error('两次输入的密码不一致')
   }
 }
 
-// 切换登录/注册模式
+// 恢复原来的切换模式方法
 const toggleMode = () => {
   isLogin.value = !isLogin.value
   formData.username = ''
@@ -161,4 +153,102 @@ const handleSubmit = async (values) => {
 const handleCancel = () => {
   loginModalStore.hide()
 }
+
+// 获取滚动条宽度
+const getScrollbarWidth = () => {
+  const outer = document.createElement('div')
+  outer.style.visibility = 'hidden'
+  outer.style.overflow = 'scroll'
+  document.body.appendChild(outer)
+
+  const inner = document.createElement('div')
+  outer.appendChild(inner)
+
+  const scrollbarWidth = outer.offsetWidth - inner.offsetWidth
+  outer.parentNode.removeChild(outer)
+
+  return scrollbarWidth
+}
+
+// 监听模态框显示状态
+watch(isVisible, (newValue) => {
+  if (newValue) {
+    // 模态框打开时
+    const scrollbarWidth = getScrollbarWidth()
+    document.body.style.paddingRight = `${scrollbarWidth}px`
+    document.body.style.overflow = 'hidden'
+  } else {
+    // 模态框关闭时，等待动画结束
+    setTimeout(() => {
+      document.body.style.paddingRight = ''
+      document.body.style.overflow = ''
+    }, 300) // 300ms 与动画时长保持一致
+  }
+})
 </script>
+
+<style scoped>
+.modal-transform {
+  transform-origin: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-transform-enter-from,
+.modal-transform-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.modal-transform-enter-to,
+.modal-transform-leave-from {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 自定义模态框样式 */
+:deep(.n-modal) {
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Ant Design 表单样式调整 */
+:deep(.ant-input-affix-wrapper) {
+  border-radius: 8px;
+  padding: 8px 11px;
+}
+
+:deep(.ant-btn) {
+  border-radius: 8px;
+  height: 42px;
+  margin-top: 0;
+}
+
+:deep(.ant-btn-primary) {
+  background: linear-gradient(to right, #3b82f6, #2563eb);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+:deep(.ant-btn-primary:hover) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+:deep(.site-form-item-icon) {
+  color: #bfbfbf;
+}
+
+:deep(.ant-form-item-explain-error) {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* 统一表单项间距 */
+:deep(.ant-form-item) {
+  margin-bottom: 24px !important;
+}
+
+:deep(.ant-form-item:last-child) {
+  margin-bottom: 0;
+}
+</style>

@@ -69,22 +69,22 @@ router.afterEach((to) => {
 const items = ref([
   {
     key: '/home',
-    icon: () => h(HomeOutlined),
+    // icon: () => h(HomeOutlined),
     label: '主页',
   },
   {
     key: '/topics',   // 修改key与路由路径匹配
-    icon: () => h(BookOutlined),
+    // icon: () => h(BookOutlined),
     label: '题库',
   },
   {
     key: '/forum', // 修改key与路由路径匹配
-    icon: () => h(MessageOutlined),
+    // icon: () => h(MessageOutlined),
     label: '讨论',
   },
   {
     key: '/about',      // 修改key与路由路径匹配
-    icon: () => h(InfoCircleOutlined),
+    // icon: () => h(InfoCircleOutlined),
     label: '关于',
   }
 ]);
