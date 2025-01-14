@@ -44,6 +44,9 @@
               </a-button>
               <span class="fire-count cursor-pointer">0</span>
             </div>
+            <a-button type="text" class="icon-btn" shape="square" @click="handleProfileClick">
+              <UserOutlined />
+            </a-button>
             <a-button @click="showLoginModal">登录</a-button>
           </div>
         </div>
@@ -70,7 +73,8 @@ import {
   InfoCircleOutlined,
   SearchOutlined,
   FireOutlined,
-  BellOutlined
+  BellOutlined,
+  UserOutlined  // 添加 UserOutlined 导入
 } from '@ant-design/icons-vue';
 import { useRouter, useRoute } from 'vue-router';
 import Footer from "./components/Footer.vue";
@@ -191,6 +195,11 @@ const handleSearch = () => {
   console.log('搜索:', searchQuery.value);
 };
 
+// 添加个人主页点击处理函数
+const handleProfileClick = () => {
+  router.push('/personal-center');
+};
+
 // 添加全局点击事件处理器来关闭搜索框
 onMounted(() => {
   document.addEventListener('click', (e) => {
@@ -291,7 +300,7 @@ onMounted(() => {
 }
 
 :deep(.ant-menu-item-selected) {
-  background-color: transparent !important;
+  background-color: transparent !重要;
 }
 
 :deep(.ant-menu-item:hover) {
@@ -344,7 +353,7 @@ onMounted(() => {
 .search-input :deep(.ant-input) {
   border: none !important;
   box-shadow: none !important;
-  padding-left: 2px !important;  /* 调整输入框组件的内部左边距 */
+  padding-left: 2px !重要;  /* 调整输入框组件的内部左边距 */
   padding-right: 11px !important;
 }
 

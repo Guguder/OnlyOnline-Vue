@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import PersonalCenter from '../views/PersonalCenter.vue'
 
 const routes = [
   {
@@ -41,6 +42,14 @@ const routes = [
     meta: { 
       requiresAuth: true,  // 需要登录才能访问
       title: '消息通知'
+    }
+  },
+  {
+    path: '/personal-center',
+    name: 'PersonalCenter',
+    component: PersonalCenter,
+    meta: {
+      title: '个人中心'
     }
   },
   // 添加通配符路由在最后
