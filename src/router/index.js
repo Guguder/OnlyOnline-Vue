@@ -34,6 +34,15 @@ const routes = [
     name: 'PostDetail',
     component: () => import('../views/topics/PostDetailView.vue')
   },
+  {
+    path: '/notifications',
+    name: 'notifications',
+    component: () => import('../views/NotificationsView.vue'),
+    meta: { 
+      requiresAuth: true,  // 需要登录才能访问
+      title: '消息通知'
+    }
+  },
   // 添加通配符路由在最后
   {
     path: '/:pathMatch(.*)*',

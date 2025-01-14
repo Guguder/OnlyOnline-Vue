@@ -13,23 +13,35 @@
       <tbody>
       <tr v-for="week in calendar" :key="week[0].date">
         <td v-for="day in week" :key="day.date"
-            class="text-center relative group cursor-pointer h-[40px]"
-            @click="handleDateClick(day)">
-          <div :class="[
-              'w-8 h-8 mx-auto flex items-center justify-center rounded-full',  // 这里修改尺寸
-              'text-gray-900 transition-all duration-200 text-sm hover:bg-blue-50',
-              {
-                'opacity-0': !day.dayOfMonth,
-                'bg-blue-500 text-white hover:bg-blue-600': day.isToday
-              }
-            ]">
+            class="text-center relative h-[40px]">
+          <a-tooltip v-if="day.dayOfMonth && getQuestionByDate(day.date)" overlayClassName="calendar-tooltip">
+            <template #title>
+              <div class="flex flex-col items-center">
+                <span class="text-gray-400">{{ formatDate(day.date) }}</span>
+                <span class="mt-1">{{ getQuestionByDate(day.date) }}</span>
+              </div>
+            </template>
+            <div 
+              :class="[
+                'w-8 h-8 mx-auto flex items-center justify-center rounded-full',
+                'text-gray-900 transition-all duration-200 text-sm hover:bg-blue-50',
+                {
+                  'bg-blue-500 text-white hover:bg-blue-600': day.isToday
+                }
+              ]"
+              @click="handleDateClick(day)"
+            >
+              {{ day.dayOfMonth }}
+            </div>
+          </a-tooltip>
+          <div v-else-if="day.dayOfMonth"
+               :class="[
+                 'w-8 h-8 mx-auto flex items-center justify-center rounded-full',
+                 'text-gray-900 text-sm',
+                 { 'bg-blue-500 text-white': day.isToday }
+               ]"
+          >
             {{ day.dayOfMonth }}
-          </div>
-          <!-- 悬停提示 -->
-          <div v-if="getQuestionByDate(day.date)"
-               class="absolute hidden group-hover:block bg-white shadow-xl rounded-lg p-4 z-50 w-[280px] left-1/2 transform -translate-x-1/2 mt-2 pointer-events-none">
-            <div class="text-blue-600 text-sm mb-2">{{ formatDate(day.date) }}</div>
-            <div class="text-gray-800 text-sm leading-6">{{ getQuestionByDate(day.date) }}</div>
           </div>
         </td>
       </tr>
@@ -75,6 +87,7 @@
 import {ref, computed, onMounted, onUnmounted} from 'vue';
 import dayjs from 'dayjs';
 import ActivityHeatmap from "./ActivityHeatmap.vue";
+import { Tooltip as ATooltip } from 'ant-design-vue';
 
 const continuousSubmit = ref(0)
 const monthSolved = ref(0)
@@ -202,50 +215,39 @@ const handleDateClick = (day) => {
   transition: all 0.2s;
   vertical-align: middle;
   padding: 0;
+  cursor: default;
 }
 
-/* 悬浮框相关样式 */
+/* 删除原有的悬浮框相关样式 */
 .group-hover\:block {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
   display: none;
 }
 
-.group:hover .group-hover\:block {
-  display: block;
+/* 添加新的Tooltip样式 */
+:global(.calendar-tooltip) {
+  font-size: 11px !important;
 }
 
-.group {
-  position: relative;
-  z-index: 1;
+:global(.calendar-tooltip .ant-tooltip-inner) {
+  background-color: white !important;
+  color: #666 !important;
+  padding: 8px 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  text-align: center !important;
+  min-height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-direction: column !important;
 }
 
-.group:hover {
-  z-index: 10;
+:global(.calendar-tooltip .ant-tooltip-arrow) {
+  --antd-arrow-background-color: white !important;
 }
 
-.group-hover\:block .text-gray-900,
-.group-hover\:block .text-gray-600 {
-  margin: 0;
-  line-height: 1.5;
-}
-
-/* 日期单元格交互样式 */
-.custom-calendar td:hover .rounded-full:not(.bg-blue-500) {
-  background-color: #EBF5FF;
-  color: #2563EB;
-}
-
-/* 悬浮提示小三角 */
-.group:hover .group-hover\:block::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 4px solid #1f2937;
+:global(.calendar-tooltip .ant-tooltip-arrow::before),
+:global(.calendar-tooltip .ant-tooltip-arrow::after) {
+  background-color: white !important;
 }
 
 </style>

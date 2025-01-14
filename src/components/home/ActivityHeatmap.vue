@@ -25,7 +25,14 @@
               day.isFuture ? 'invisible' : (day.count > 0 ? 'bg-green-500' : 'bg-gray-100')
             ]"
             role="gridcell"
-        ></div>
+        >
+          <a-tooltip overlayClassName="heatmap-tooltip">
+            <template #title>
+              <span>{{ formatDate(day.date) }} {{ day.count > 0 ? '已完成' : '未完成' }}</span>
+            </template>
+            <div class="w-full h-full"></div>
+          </a-tooltip>
+        </div>
       </div>
     </div>
   </div>
@@ -42,6 +49,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { Tooltip as ATooltip } from 'ant-design-vue'
 
 // 添加 props 定义
 const props = defineProps({
@@ -92,6 +100,15 @@ const generateMockData = () => {
   return data
 }
 
+// 添加日期格式化函数
+const formatDate = (dateString) => {
+  const date = new Date(dateString)
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  return `${year}年${month}月${day}日`
+}
+
 // 修改月份计算逻辑
 const displayMonths = computed(() => {
   const today = new Date()
@@ -123,3 +140,37 @@ onMounted(() => {
   contributionData.value = generateMockData()
 })
 </script>
+
+<style scoped>
+.ant-tooltip {
+  font-size: 12px;
+}
+
+:global(.heatmap-tooltip) {
+  font-size: 11px !important;
+}
+
+:global(.heatmap-tooltip .ant-tooltip-inner) {
+  background-color: white !important;
+  color: #666 !important;
+  padding: 4px 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  text-align: center !important;
+  min-height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+:global(.heatmap-tooltip .ant-tooltip-arrow) {
+  --antd-arrow-background-color: white !important;
+}
+
+:global(.heatmap-tooltip .ant-tooltip-arrow::before) {
+  background-color: white !important;
+}
+
+:global(.heatmap-tooltip .ant-tooltip-arrow::after) {
+  background-color: white !important;
+}
+</style>

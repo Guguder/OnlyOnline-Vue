@@ -170,6 +170,7 @@ const hasNotification = ref(true);
 
 const handleNotificationClick = () => {
   hasNotification.value = false;
+  router.push('/notifications');  // 添加路由跳转
 };
 
 // 修改搜索相关的逻辑
