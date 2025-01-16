@@ -52,6 +52,14 @@ const routes = [
       title: '个人中心'
     }
   },
+  {
+    path: '/problem/:id',
+    name: 'SqlProblemDetail',
+    component: () => import('../views/problem/SqlProblemDetail.vue'),
+    meta: {
+      hideNavAndFooter: true  // 已经设置了隐藏导航栏和页脚的标记
+    }
+  },
   // 添加通配符路由在最后
   {
     path: '/:pathMatch(.*)*',
