@@ -1,26 +1,29 @@
 <template>
-  <n-modal
-    v-model:show="isVisible"
+  <a-modal
+    v-model:visible="isVisible"
     :mask-closable="false"
-    preset="dialog"
-    style="width: 400px; border-radius: 12px;"
-    :show-icon="false"
-    transform-origin="center"
+    :footer="null"
+    width="400px"
+    :centered="true"
+    :destroy-on-close="true"
     class="modal-transform custom-modal"
+    :closable="true"
+    :body-style="{ padding: 0 }"
+    @cancel="handleCancel"
   >
     <div class="p-8">
       <!-- 标题区域 -->
       <div class="text-center mb-8">
-        <h2 class="text-2xl font-semibold text-primary-900">{{ isLogin ? '欢迎回来' : '创建账号' }}</h2>
-        <p class="text-gray-500 mt-2 text-sm">{{ isLogin ? '登录你的账号继续' : '快速注册开始体验' }}</p>
+        <h2 class="text-2xl font-semibold text-primary-900">
+          {{ isLogin ? "欢迎回来" : "创建账号" }}
+        </h2>
+        <p class="text-gray-500 mt-2 text-sm">
+          {{ isLogin ? "登录你的账号继续" : "快速注册开始体验" }}
+        </p>
       </div>
 
       <!-- 表单区域 -->
-      <a-form
-        ref="formRef"
-        :model="formData"
-        @finish="handleSubmit"
-      >
+      <a-form ref="formRef" :model="formData" @finish="handleSubmit">
         <a-form-item
           name="username"
           :rules="[{ required: true, message: '请输入用户名' }]"
@@ -53,14 +56,14 @@
 
         <a-form-item
           v-if="!isLogin"
-          name="confirmPassword"
+          name="checkPassword"
           :rules="[
             { required: true, message: '请确认密码' },
-            { validator: validateConfirmPassword }
+            { validator: validateCheckPassword },
           ]"
         >
           <a-input-password
-            v-model:value="formData.confirmPassword"
+            v-model:value="formData.checkPassword"
             placeholder="请确认密码"
             size="large"
           >
@@ -78,113 +81,125 @@
             block
             size="large"
           >
-            {{ isLogin ? '登录' : '注册' }}
+            {{ isLogin ? "登录" : "注册" }}
           </a-button>
         </a-form-item>
 
         <!-- 切换登录/注册 -->
         <div class="text-center">
           <a-button type="link" @click="toggleMode">
-            {{ isLogin ? '还没有账号？点击注册' : '已有账号？点击登录' }}
+            {{ isLogin ? "还没有账号？点击注册" : "已有账号？点击登录" }}
           </a-button>
         </div>
       </a-form>
     </div>
-  </n-modal>
+  </a-modal>
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch } from 'vue'
-import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
-import { useAuthStore } from '../../stores/auth'
-import { useLoginModalStore } from '../../stores/useLoginModal'
+import { ref, reactive, computed, watch } from "vue";
+import { UserOutlined, LockOutlined } from "@ant-design/icons-vue";
+import { useAuthStore } from "../../stores/auth";
+import { useLoginModalStore } from "../../stores/useLoginModal";
 
-const loginModalStore = useLoginModalStore()
-const authStore = useAuthStore()
+const loginModalStore = useLoginModalStore();
+const authStore = useAuthStore();
 const isVisible = computed({
   get: () => loginModalStore.isVisible,
   set: (value) => {
-    if (!value) loginModalStore.hide()
-  }
-})
+    if (!value) loginModalStore.hide();
+  },
+});
 
-const isLogin = ref(true)
-const loading = ref(false)
+const isLogin = ref(true);
+const loading = ref(false);
 
 const formData = reactive({
-  username: '',
-  password: '',
-  confirmPassword: ''
-})
+  username: "",
+  password: "",
+  checkPassword: "",
+});
 
-// 验证确认密码
-const validateConfirmPassword = async (rule, value) => {
+// 验证确认密码（改名）
+const validateCheckPassword = async (rule, value) => {
   if (value && value !== formData.password) {
-    throw new Error('两次输入的密码不一致')
+    throw new Error("两次输入的密码不一致");
   }
-}
+};
 
 // 恢复原来的切换模式方法
 const toggleMode = () => {
-  isLogin.value = !isLogin.value
-  formData.username = ''
-  formData.password = ''
-  formData.confirmPassword = ''
-}
+  isLogin.value = !isLogin.value;
+  formData.username = "";
+  formData.password = "";
+  formData.checkPassword = "";
+};
 
 // 处理表单提交
 const handleSubmit = async (values) => {
-  loading.value = true
+  loading.value = true;
   try {
     if (isLogin.value) {
-      await authStore.login(values)
+      const loginResult = await authStore.login({
+        username: values.username,
+        password: values.password,
+      });
+      if (loginResult) {
+        loginModalStore.hide();
+        message.success("登录成功");
+      }
     } else {
-      await authStore.register(values)
+      await authStore.register({
+        username: values.username,
+        password: values.password,
+        checkPassword: values.checkPassword,
+      });
+      isLogin.value = true;
+      message.success("注册成功，请登录");
     }
-    loginModalStore.hide()
   } catch (error) {
-    console.error('Authentication error:', error)
+    console.error("认证错误:", error);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 // 取消处理
 const handleCancel = () => {
-  loginModalStore.hide()
-}
+  loginModalStore.hide();
+};
 
 // 获取滚动条宽度
 const getScrollbarWidth = () => {
-  const outer = document.createElement('div')
-  outer.style.visibility = 'hidden'
-  outer.style.overflow = 'scroll'
-  document.body.appendChild(outer)
+  const outer = document.createElement("div");
+  outer.style.visibility = "hidden";
+  outer.style.overflow = "scroll";
+  document.body.appendChild(outer);
 
-  const inner = document.createElement('div')
-  outer.appendChild(inner)
+  const inner = document.createElement("div");
+  outer.appendChild(inner);
 
-  const scrollbarWidth = outer.offsetWidth - inner.offsetWidth
-  outer.parentNode.removeChild(outer)
+  const scrollbarWidth = outer.offsetWidth - inner.offsetWidth;
+  outer.parentNode.removeChild(outer);
 
-  return scrollbarWidth
-}
+  return scrollbarWidth;
+};
 
 // 监听模态框显示状态
 watch(isVisible, (newValue) => {
   if (newValue) {
     // 模态框打开时
-    const scrollbarWidth = getScrollbarWidth()
-    document.body.style.paddingRight = `${scrollbarWidth}px`
-    document.body.style.overflow = 'hidden'
+    const scrollbarWidth = getScrollbarWidth();
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+    document.body.style.overflow = "hidden";
   } else {
     // 模态框关闭时，等待动画结束
     setTimeout(() => {
-      document.body.style.paddingRight = ''
-      document.body.style.overflow = ''
-    }, 300) // 300ms 与动画时长保持一致
+      document.body.style.paddingRight = "";
+      document.body.style.overflow = "";
+    }, 300); // 300ms 与动画时长保持一致
   }
-})
+});
 </script>
 
 <style scoped>
@@ -206,9 +221,32 @@ watch(isVisible, (newValue) => {
 }
 
 /* 自定义模态框样式 */
-:deep(.n-modal) {
+:deep(.ant-modal-content) {
+  padding: 0;
+  border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+:deep(.ant-modal-body) {
+  padding: 0;
+}
+
+:deep(.ant-modal-footer) {
+  display: none;
+}
+
+/* 动画效果 */
+.modal-transform {
+  transform-origin: center;
+}
+
+:deep(.ant-modal) {
+  padding-bottom: 0;
+}
+
+:deep(.ant-modal-mask) {
+  background-color: rgba(0, 0, 0, 0.45);
 }
 
 /* Ant Design 表单样式调整 */
@@ -250,5 +288,24 @@ watch(isVisible, (newValue) => {
 
 :deep(.ant-form-item:last-child) {
   margin-bottom: 0;
+}
+
+/* 自定义关闭按钮样式 */
+:deep(.ant-modal-close) {
+  top: 16px;
+  right: 16px;
+  color: #999;
+  transition: all 0.3s ease;
+}
+
+:deep(.ant-modal-close:hover) {
+  color: #666;
+  transform: rotate(90deg);
+}
+
+:deep(.ant-modal-close-x) {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
 }
 </style>

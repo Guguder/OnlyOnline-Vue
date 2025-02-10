@@ -47,15 +47,37 @@
           </a-button>
           <span class="fire-count cursor-pointer">0</span>
         </div>
-        <a-button
-          type="text"
-          class="icon-btn"
-          shape="square"
-          @click="handleProfileClick"
-        >
-          <UserOutlined />
-        </a-button>
-        <a-button @click="showLoginModal">登录</a-button>
+
+        <!-- 用户未登录显示登录按钮，登录后显示头像 -->
+        <template v-if="!authStore.isAuthenticated">
+          <a-button @click="showLoginModal">登录</a-button>
+        </template>
+        <template v-else>
+          <a-dropdown :trigger="['click']">
+            <a-avatar
+              :size="32"
+              class="cursor-pointer hover:opacity-80 transition-opacity"
+              :src="authStore.userInfo?.avatar || '默认头像URL'"
+            />
+            <template #overlay>
+              <a-menu>
+                <a-menu-item key="profile" @click="handleProfileClick">
+                  <UserOutlined />
+                  <span>个人中心</span>
+                </a-menu-item>
+                <a-menu-item key="settings">
+                  <SettingOutlined />
+                  <span>设置</span>
+                </a-menu-item>
+                <a-menu-divider />
+                <a-menu-item key="logout" @click="handleLogout">
+                  <LogoutOutlined />
+                  <span>退出登录</span>
+                </a-menu-item>
+              </a-menu>
+            </template>
+          </a-dropdown>
+        </template>
       </div>
     </div>
   </a-layout-header>
@@ -69,12 +91,16 @@ import {
   FireOutlined,
   BellOutlined,
   UserOutlined,
+  SettingOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons-vue";
 import { useLoginModal } from "../../stores/useLoginModal";
+import { useAuthStore } from "../../stores/auth";
 
 const router = useRouter();
 const route = useRoute();
 const { showLoginModal } = useLoginModal();
+const authStore = useAuthStore();
 
 const current = ref([]);
 const isExpanded = ref(false);
@@ -134,6 +160,12 @@ const handleNotificationClick = () => {
 
 const handleProfileClick = () => {
   router.push("/personal-center");
+};
+
+// 处理退出登录
+const handleLogout = () => {
+  authStore.logout();
+  router.push("/home");
 };
 
 // 监听路由变化
@@ -324,5 +356,32 @@ onMounted(() => {
 :deep(.ant-input:focus) {
   border: none !important;
   box-shadow: none !important;
+}
+
+/* 添加头像样式 */
+:deep(.ant-avatar) {
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+:deep(.ant-avatar:hover) {
+  border-color: #1890ff;
+  transform: scale(1.05);
+}
+
+/* 下拉菜单样式 */
+:deep(.ant-dropdown-menu) {
+  padding: 4px;
+  border-radius: 8px;
+}
+
+:deep(.ant-dropdown-menu-item) {
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+:deep(.ant-dropdown-menu-item .anticon) {
+  margin-right: 8px;
 }
 </style>

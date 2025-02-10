@@ -11,6 +11,7 @@
   "dependencies": {
     "@ant-design/icons-vue": "^7.0.1",
     "ant-design-vue": "^4.2.6",
+    "axios": "^1.7.9",
     "echarts": "^5.6.0",
     "lucide-vue-next": "^0.469.0",
     "monaco-editor": "^0.52.2",
@@ -19,8 +20,7 @@
     "vditor": "^3.10.8",
     "vue": "^3.5.13",
     "vue-calendar-heatmap": "^0.8.4",
-    "vue-router": "^4.2.5",
-    "vuex": "^4.1.0"
+    "vue-router": "^4.2.5"
   },
   "devDependencies": {
     "@vicons/ionicons5": "^0.12.0",

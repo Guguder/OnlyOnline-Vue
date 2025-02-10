@@ -3,7 +3,7 @@
     <!-- 标题栏 -->
     <div class="flex items-center gap-2 pb-4 border-b border-gray-100">
       <button
-        class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+        class="p-2 hover:bg-gray-100 rounded-lg transition-colors ml-[-10px]"
         @click="$emit('close')"
       >
         <svg
@@ -81,7 +81,7 @@
         <div class="flex flex-col gap-2">
           <label class="text-sm text-gray-600 font-bold">生日</label>
           <a-date-picker
-            v-model:value="userInfo.birthday"
+            v-model:value="userInfo.birthDate"
             class="w-full"
             :locale="locale"
           />
@@ -89,7 +89,7 @@
         <div class="flex flex-col gap-2">
           <label class="text-sm text-gray-600 font-bold">现居地</label>
           <a-cascader
-            v-model:value="userInfo.location"
+            v-model:value="userInfo.address"
             :options="cityOptions"
             placeholder="请选择城市"
             class="!w-full"
@@ -115,14 +115,24 @@
         </div>
         <div class="flex flex-col gap-2">
           <label class="text-sm text-gray-600 font-bold">个人网站</label>
-          <a-input v-model:value="userInfo.website" placeholder="请输入网址" />
+          <a-input
+            v-model:value="userInfo.personalWebsite"
+            placeholder="请输入网址"
+          />
         </div>
       </div>
+
+      <!-- 个性签名 -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sm text-gray-600 font-bold">个性签名</label>
+        <a-input v-model:value="userInfo.sign" placeholder="请输入个性签名" />
+      </div>
+
       <!-- 个人简介 -->
       <div class="flex flex-col gap-2">
         <label class="text-sm text-gray-600 font-bold">个人简介</label>
         <a-textarea
-          v-model:value="userInfo.bio"
+          v-model:value="userInfo.profileSummary"
           :rows="4"
           placeholder="请输入个人简介"
           :maxLength="200"
@@ -159,26 +169,69 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import zhCN from "ant-design-vue/es/date-picker/locale/zh_CN";
+import dayjs from "dayjs"; // 需要引入 dayjs 处理日期
+import { user } from "../api/user";
+import { message } from "ant-design-vue";
+import { cityOptions } from "../constants/cityData"; // 导入城市数据
+
+const props = defineProps({
+  userData: {
+    type: Object,
+    required: true,
+  },
+});
 
 const locale = zhCN;
-const avatarUrl = ref(
-  "https://srv.carbonads.net/static/30242/4f7f59796c5dda8f5dfc63a40583dfde7cebb050"
-);
 
 // 用户信息
 const userInfo = ref({
-  nickname: "咕",
+  accountId: "",
+  nickname: "",
   gender: "secret",
-  birthday: null,
-  location: [],
+  birthDate: null,
+  address: [],
+  position: "",
   school: "",
   company: "",
-  position: "全栈开发工程师",
-  website: "",
-  tags: [],
-  bio: "",
+  personalWebsite: "",
+  profileSummary: "",
+  sign: "",
+  avatar: "",
+  tags: [], // 保留tags字段以支持标签功能
+});
+
+// 在组件挂载时初始化用户数据
+onMounted(() => {
+  // 转换日期为 dayjs 对象
+  const birthDate = props.userData.birthDate
+    ? dayjs(props.userData.birthDate)
+    : null;
+
+  userInfo.value = {
+    ...userInfo.value,
+    accountId: props.userData.accountId || "",
+    nickname: props.userData.nickname || "",
+    gender:
+      props.userData.gender === -1
+        ? "secret"
+        : props.userData.gender === 1
+        ? "male"
+        : "female",
+    birthDate: birthDate,
+    address: props.userData.address ? [props.userData.address] : [],
+    position: props.userData.position || "", // 添加职位字段
+    school: props.userData.school || "",
+    company: props.userData.company || "",
+    personalWebsite: props.userData.personalWebsite || "",
+    sign: props.userData.sign || "", // 个性签名使用 sign 字段
+    profileSummary: props.userData.profileSummary || "", // 个人简介使用 profileSummary 字段
+    avatar: props.userData.avatar || "",
+    tags: props.userData.tags || [], // 如果有标签数据的话
+  };
+
+  console.log("初始化的用户数据：", userInfo.value); // 用于调试
 });
 
 // 标签选项
@@ -205,101 +258,46 @@ const toggleTag = (tagValue) => {
   }
 };
 
-// 城市选项数据
-const cityOptions = [
-  {
-    value: "guangdong",
-    label: "广东省",
-    children: [
-      {
-        value: "shenzhen",
-        label: "深圳市",
-        children: [
-          { value: "nanshan", label: "南山区" },
-          { value: "futian", label: "福田区" },
-          { value: "luohu", label: "罗湖区" },
-          { value: "baoan", label: "宝安区" },
-          { value: "longgang", label: "龙岗区" },
-          { value: "longhua", label: "龙华区" },
-        ],
-      },
-      {
-        value: "guangzhou",
-        label: "广州市",
-        children: [
-          { value: "tianhe", label: "天河区" },
-          { value: "yuexiu", label: "越秀区" },
-          { value: "haizhu", label: "海珠区" },
-          { value: "liwan", label: "荔湾区" },
-        ],
-      },
-    ],
-  },
-  {
-    value: "beijing",
-    label: "北京市",
-    children: [
-      {
-        value: "beijing",
-        label: "北京市",
-        children: [
-          { value: "chaoyang", label: "朝阳区" },
-          { value: "haidian", label: "海淀区" },
-          { value: "dongcheng", label: "东城区" },
-          { value: "xicheng", label: "西城区" },
-        ],
-      },
-    ],
-  },
-  {
-    value: "shanghai",
-    label: "上海市",
-    children: [
-      {
-        value: "shanghai",
-        label: "上海市",
-        children: [
-          { value: "pudong", label: "浦东新区" },
-          { value: "xuhui", label: "徐汇区" },
-          { value: "changning", label: "长宁区" },
-          { value: "putuo", label: "普陀区" },
-        ],
-      },
-    ],
-  },
-  {
-    value: "zhejiang",
-    label: "浙江省",
-    children: [
-      {
-        value: "hangzhou",
-        label: "杭州市",
-        children: [
-          { value: "xihu", label: "西湖区" },
-          { value: "shangcheng", label: "上城区" },
-          { value: "xiacheng", label: "下城区" },
-          { value: "jianggan", label: "江干区" },
-        ],
-      },
-      {
-        value: "ningbo",
-        label: "宁波市",
-        children: [
-          { value: "haishu", label: "海曙区" },
-          { value: "jiangbei", label: "江北区" },
-          { value: "beilun", label: "北仑区" },
-        ],
-      },
-    ],
-  },
-];
+const handleSave = async () => {
+  const saveData = {
+    accountId: props.userData.accountId,
+    address: userInfo.value.address ? userInfo.value.address[0] : "",
+    gender:
+      userInfo.value.gender === "secret"
+        ? -1
+        : userInfo.value.gender === "male"
+        ? 1
+        : 0,
+    school: userInfo.value.school || "",
+    profileSummary: userInfo.value.profileSummary || "",
+    personalWebsite: userInfo.value.personalWebsite || "",
+    nickname: userInfo.value.nickname || "",
+    sign: userInfo.value.sign || "",
+    company: userInfo.value.company || "",
+    avatar: userInfo.value.avatar || "",
+    position: userInfo.value.position || "",
+    birthDate: userInfo.value.birthDate
+      ? userInfo.value.birthDate.format("YYYY-MM-DD HH:mm:ss")
+      : null, // 修改日期格式
+  };
 
-const handleSave = () => {
-  console.log("保存的用户信息：", userInfo.value);
-  // 这里添加保存逻辑
+  try {
+    console.log("准备发送的数据：", saveData); // 添加日志便于调试
+    const res = await user.updateUserInfo(saveData);
+    if (res.code === 200) {
+      // 修改判断条件为 200
+      message.success("保存成功");
+      emit("update", res.data); // 传递更新后的数据
+    } else {
+      message.error(res.msg || "保存失败"); // 使用 res.msg 替代 res.message
+    }
+  } catch (error) {
+    console.error("保存失败：", error);
+    message.error("保存失败，请重试");
+  }
 };
 
-defineEmits(["close"]);
+const emit = defineEmits(["close", "update"]); // 添加 update 事件
 </script>
 
 <style scoped>

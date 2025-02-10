@@ -1,16 +1,20 @@
 <template>
+  <PersonalCenterSkeleton v-if="loading" />
   <div
+    v-else
     class="w-screen min-h-screen flex flex-col items-center gap-[20px] mt-[20px] mb-[40px]"
   >
     <!-- Header Section -->
-    <div class="w-[1200px] rounded-2xl px-6 pt-6">
+    <div class="w-[1200px] rounded-2xl px-2 pt-6">
       <div class="w-full">
         <div class="flex items-center gap-4">
-          <a-avatar :size="64" :src="avatarUrl" />
+          <a-avatar :size="128" :src="avatarUrl" />
           <div>
-            <h1 class="text-2xl font-bold">咕</h1>
-            <p class="text-gray-500">MgGUCFVB7R</p>
-            <p class="text-gray-600">全站排名 100,000</p>
+            <h1 class="text-2xl font-bold">{{ userInfo.nickname }}</h1>
+            <p class="text-gray-500">{{ userInfo.accountId }}</p>
+            <p class="text-gray-600 font-semibold">
+              {{ userInfo.sign || "此人已躺平，拒绝卷王打扰。" }}
+            </p>
           </div>
         </div>
       </div>
@@ -36,7 +40,7 @@
                   d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                 />
               </svg>
-              <span>全栈开发工程师</span>
+              <span>{{ position }}</span>
             </div>
             <div class="flex items-center gap-2 text-gray-600">
               <svg
@@ -58,7 +62,7 @@
                   d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                 />
               </svg>
-              <span>深圳市</span>
+              <span>{{ address }}</span>
             </div>
             <div class="flex items-center gap-2 text-gray-600">
               <svg
@@ -74,7 +78,7 @@
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              <span>已加入 365 天</span>
+              <span>已加入 {{ joinDays }} 天</span>
             </div>
           </div>
 
@@ -415,6 +419,8 @@ import * as echarts from "echarts";
 import UserInteractions from "../components/UserInteractions.vue";
 import EditProfile from "../components/EditUserInfo.vue";
 import ContributionPlot from "../components/ContributionPlot.vue";
+import { useAuthStore } from "../stores/auth";
+import { PersonalCenterSkeleton } from "../components/skeletons";
 
 // 解题进度数据
 const easyProgress = ref({
@@ -483,8 +489,27 @@ const switchView = (view) => {
   currentView.value = currentView.value === view ? "default" : view;
 };
 
-const avatarUrl = ref(
-  "https://srv.carbonads.net/static/30242/4f7f59796c5dda8f5dfc63a40583dfde7cebb050"
+const authStore = useAuthStore();
+
+// 从用户信息中获取数据
+const userInfo = computed(() => authStore.userInfo || {});
+
+// 处理地址和职位信息，如果没有则显示"暂无"
+const address = computed(() => userInfo.value?.address || "暂无");
+const position = computed(() => userInfo.value?.position || "暂无");
+
+// 计算加入天数
+const joinDays = computed(() => {
+  if (!userInfo.value?.createTime) return 0;
+  const createDate = new Date(userInfo.value.createTime);
+  const today = new Date();
+  const diffTime = Math.abs(today - createDate);
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+});
+
+// 用户头像
+const avatarUrl = computed(
+  () => userInfo.value?.avatar || "default-avatar-url"
 );
 
 // 添加贡献数据
@@ -581,6 +606,15 @@ const totalProblems = computed(
 const progressPercentage = computed(() =>
   Math.round((totalSolved.value / totalProblems.value) * 100)
 );
+
+const loading = ref(true);
+
+onMounted(() => {
+  // 模拟加载延迟
+  setTimeout(() => {
+    loading.value = false;
+  }, 2000);
+});
 </script>
 
 <style scoped>
