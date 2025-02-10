@@ -1,7 +1,5 @@
 <template>
-  <PersonalCenterSkeleton v-if="loading" />
   <div
-    v-else
     class="w-screen min-h-screen flex flex-col items-center gap-[20px] mt-[20px] mb-[40px]"
   >
     <!-- Header Section -->
@@ -406,7 +404,9 @@
         <EditProfile
           v-else-if="currentView === 'edit'"
           class="bg-white rounded-2xl p-6"
+          :user-data="userInfo"
           @close="currentView = 'default'"
+          @update="handleUserInfoUpdate"
         />
       </div>
     </div>
@@ -416,11 +416,10 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import * as echarts from "echarts";
-import UserInteractions from "../components/UserInteractions.vue";
-import EditProfile from "../components/EditUserInfo.vue";
-import ContributionPlot from "../components/ContributionPlot.vue";
-import { useAuthStore } from "../stores/auth";
-import { PersonalCenterSkeleton } from "../components/skeletons";
+import UserInteractions from "../../components/user/UserInteractions.vue";
+import EditProfile from "../../components/user/EditUserInfo.vue";
+import ContributionPlot from "../../components/user/ContributionPlot.vue";
+import { useAuthStore } from "../../stores/auth.js";
 
 // 解题进度数据
 const easyProgress = ref({
@@ -588,7 +587,6 @@ const discussionList = ref([
   },
 ]);
 
-// 在 script setup 中添加或修改以下计算属性
 const totalSolved = computed(
   () =>
     easyProgress.value.solved +
@@ -606,15 +604,6 @@ const totalProblems = computed(
 const progressPercentage = computed(() =>
   Math.round((totalSolved.value / totalProblems.value) * 100)
 );
-
-const loading = ref(true);
-
-onMounted(() => {
-  // 模拟加载延迟
-  setTimeout(() => {
-    loading.value = false;
-  }, 2000);
-});
 </script>
 
 <style scoped>

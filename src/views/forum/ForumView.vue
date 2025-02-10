@@ -1,5 +1,7 @@
 <template>
-  <div class="w-screen min-h-screen flex justify-center gap-[20px] mt-[20px] mb-[40px]">
+  <div
+    class="w-screen min-h-screen flex justify-center gap-[20px] mt-[20px] mb-[40px]"
+  >
     <!-- 左侧内容区域 -->
     <div class="w-[840px] flex flex-col gap-5">
       <!-- 讨论分类卡片 -->
@@ -8,28 +10,28 @@
         <div class="grid grid-cols-4 gap-4">
           <!-- 左侧三个大卡片 -->
           <div
-              v-for="(card, index) in cards.slice(0, 3)"
-              :key="index"
-              @click="selectCard(index)"
-              :class="[
+            v-for="(card, index) in cards.slice(0, 3)"
+            :key="index"
+            @click="selectCard(index)"
+            :class="[
               'card-container transition-all duration-300',
-              selectedCard === index ? 'active' : ''
+              selectedCard === index ? 'active' : '',
             ]"
           >
             <div class="card-content">
               <div class="icon-wrapper">
                 <component
-                    :is="card.icon"
-                    :class="[
+                  :is="card.icon"
+                  :class="[
                     'w-8 h-8',
-                    selectedCard === index ? 'text-white' : card.iconColor
+                    selectedCard === index ? 'text-white' : card.iconColor,
                   ]"
                 />
               </div>
               <span
-                  :class="[ 
+                :class="[
                   'text-lg font-medium',
-                  selectedCard === index ? 'text-white' : 'text-gray-700'
+                  selectedCard === index ? 'text-white' : 'text-gray-700',
                 ]"
               >
                 {{ card.title }}
@@ -38,31 +40,35 @@
           </div>
 
           <!-- 右侧小卡片容器 -->
-          <div class="col-span-3 sm:col-span-1 flex sm:flex-col justify-between h-[140px]">
+          <div
+            class="col-span-3 sm:col-span-1 flex sm:flex-col justify-between h-[140px]"
+          >
             <!-- 添加高度和justify-between -->
             <div
-                v-for="(card, index) in cards.slice(3)"
-                :key="index + 3"
-                @click="selectCard(index + 3)"
-                :class="[
+              v-for="(card, index) in cards.slice(3)"
+              :key="index + 3"
+              @click="selectCard(index + 3)"
+              :class="[
                 'card-container small-card transition-all duration-300 w-full',
-                selectedCard === index + 3 ? 'active' : ''
+                selectedCard === index + 3 ? 'active' : '',
               ]"
             >
               <div class="card-content">
                 <div class="icon-wrapper small-icon">
                   <component
-                      :is="card.icon"
-                      :class="[
+                    :is="card.icon"
+                    :class="[
                       'w-6 h-6',
-                      selectedCard === index + 3 ? 'text-white' : card.iconColor
+                      selectedCard === index + 3
+                        ? 'text-white'
+                        : card.iconColor,
                     ]"
                   />
                 </div>
                 <span
-                    :class="[ 
+                  :class="[
                     'text-base font-medium',
-                    selectedCard === index + 3 ? 'text-white' : 'text-gray-700'
+                    selectedCard === index + 3 ? 'text-white' : 'text-gray-700',
                   ]"
                 >
                   {{ card.title }}
@@ -76,25 +82,27 @@
       <!-- 文章区域 - 修正了位置和结构 -->
       <div class="w-full rounded-2xl bg-white">
         <!-- 头部区域：标签页和搜索 -->
-        <div class="p-5 flex items-center justify-between border-b border-gray-100">
+        <div
+          class="p-5 flex items-center justify-between border-b border-gray-100"
+        >
           <!-- 标签页 -->
           <div class="flex gap-8">
             <button
-                v-for="tab in tabs"
-                :key="tab.id"
-                @click="currentTab = tab.id"
-                :class="[
+              v-for="tab in tabs"
+              :key="tab.id"
+              @click="currentTab = tab.id"
+              :class="[
                 'text-base transition-colors relative py-2',
-                currentTab === tab.id 
-                  ? 'text-blue-500 font-medium' 
-                  : 'text-gray-500 hover:text-gray-900'
+                currentTab === tab.id
+                  ? 'text-blue-500 font-medium'
+                  : 'text-gray-500 hover:text-gray-900',
               ]"
             >
               {{ tab.name }}
               <!-- 活动标签的下划线 -->
               <div
-                  v-if="currentTab === tab.id"
-                  class="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 rounded-full"
+                v-if="currentTab === tab.id"
+                class="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 rounded-full"
               ></div>
             </button>
           </div>
@@ -102,18 +110,20 @@
           <!-- 右侧搜索和按钮 -->
           <div class="flex items-center gap-4">
             <div class="relative w-[240px]">
-              <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"/>
+              <Search
+                class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"
+              />
               <input
-                  type="text"
-                  placeholder="搜索文章"
-                  class="w-full pl-10 pr-4 py-2 bg-[#F2F3F4] rounded-lg text-sm"
-              >
+                type="text"
+                placeholder="搜索文章"
+                class="w-full pl-10 pr-4 py-2 bg-[#F2F3F4] rounded-lg text-sm"
+              />
             </div>
             <button
-                @click="showPostModal = true"
-                class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm flex items-center transition-colors"
+              @click="showPostModal = true"
+              class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm flex items-center transition-colors"
             >
-              <PencilLine class="h-4 w-4 mr-2"/>
+              <PencilLine class="h-4 w-4 mr-2" />
               发起讨论
             </button>
           </div>
@@ -121,36 +131,37 @@
 
         <!-- 修改标签筛选区域 -->
         <div class="flex flex-wrop px-2 py-3 border-b border-gray-100">
-          <div class="max-w-[800px] transition-all duration-500 ease-in-out"
-               :style="{ 
-                 maxHeight: isExpanded ? '800px' : '42px',
-                 opacity: isExpanded ? '1' : '0.95',
-               }"
-               style="overflow: hidden;">
+          <div
+            class="max-w-[800px] transition-all duration-500 ease-in-out"
+            :style="{
+              maxHeight: isExpanded ? '800px' : '42px',
+              opacity: isExpanded ? '1' : '0.95',
+            }"
+            style="overflow: hidden"
+          >
             <FilterTags
-                :tags="filterTags"
-                v-model:selectedTags="selectedTags"
-                :is-expanded="isExpanded"
+              :tags="filterTags"
+              v-model:selectedTags="selectedTags"
+              :is-expanded="isExpanded"
             />
           </div>
           <div class="py-3 pr-4">
             <ChevronDown
-                @click="toggleExpand"
-                class="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600 transition-all duration-500"
-                :class="{ 'transform rotate-180': isExpanded }"
+              @click="toggleExpand"
+              class="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600 transition-all duration-500"
+              :class="{ 'transform rotate-180': isExpanded }"
             />
           </div>
         </div>
-
 
         <!-- 文章列表 -->
         <div class="p-4">
           <div class="w-full overflow-hidden">
             <PostCard
-                v-for="article in articles"
-                :key="article.id"
-                :post="article"
-                class="w-full mb-2 last:mb-0"
+              v-for="article in articles"
+              :key="article.id"
+              :post="article"
+              class="w-full mb-2 last:mb-0"
             />
           </div>
         </div>
@@ -159,108 +170,23 @@
 
     <!-- 右侧登录区域 -->
     <div class="w-[340px] flex flex-col gap-5">
-      <LoginCard/>
+      <LoginCard />
       <div class="sticky top-[10px]">
-        <MustReadList :list="mustReadList"/>
+        <MustReadList :list="mustReadList" />
       </div>
     </div>
   </div>
 
-  <!-- 修改模态框使用方式 -->
-  <PostModal v-model="showPostModal">
-    <div class="space-y-6">
-      <!-- 标题输入框 - 更新样式 -->
-      <div class="flex flex-col gap-2 relative">
-        <input
-            type="text"
-            v-model="postTitle"
-            maxlength="20"
-            placeholder="此处输入标题"
-            class="w-full py-2 text-base font-medium border-0 focus:outline-none"
-            @focus="isTitleFocused = true"
-            @blur="isTitleFocused = false"
-        />
-        <!-- 底部线条容器 -->
-        <div class="relative h-[1px] bg-gray-200 overflow-hidden">
-          <!-- 动画线条 -->
-          <div
-              class="absolute inset-x-1/2 h-[2px] bg-purple-500 transition-all duration-300 ease-out"
-              :class="{ 'inset-x-0': isTitleFocused }"
-          ></div>
-        </div>
-      </div>
-
-      <!-- 修改导航按钮和标签搜索区域的布局 -->
-      <div class="flex flex-col gap-4">
-        <!-- 第一行：所属话题和标签搜索 -->
-        <div class="flex items-start gap-4">
-          <TopicListButton
-              text="所属话题"
-              :options="postCategoryOptions"
-              :isOpen="currentOpenDropdown === 'postCategory'"
-              @toggle="handleDropdownToggle('postCategory')"
-              @select="handlePostCategorySelect"
-          />
-
-          <!-- 标签搜索输入框，与所属话题对齐 -->
-          <div class="w-[120px] relative tag-search-container">
-            <div class="relative">
-              <input
-                  v-model="tagSearchQuery"
-                  placeholder="搜索标签..."
-                  class="w-full px-3 py-2 bg-gray-50 rounded-lg text-sm border border-gray-200 focus:outline-none focus:border-purple-500"
-                  @focus="isTagSearchFocused = true"
-              />
-              <!-- 添加清空按钮 -->
-              <button
-                  v-show="tagSearchQuery"
-                  @click="clearTagSearch"
-                  class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                <X class="w-4 h-4"/>
-              </button>
-            </div>
-
-            <!-- 修改标签搜索下拉列表部分 -->
-            <div v-if="isTagSearchFocused && filteredTags.length > 0"
-                 class="absolute left-0 right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 max-h-[200px] overflow-y-auto z-50">
-              <div v-for="tag in filteredTags"
-                   :key="tag.value"
-                   @click.stop="addTag(tag)"
-                   class="px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm">
-                {{ tag.label }}
-              </div>
-            </div>
-          </div>
-          <div class="relative flex items-center h-[36px]">
-            <!-- 已选标签展示 -->
-            <div class="flex flex-wrap gap-4 justify-center "> <!-- 对齐输入框右侧 -->
-              <div v-for="tag in selectedSearchTags"
-                   :key="tag.value"
-                   class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded text-sm">
-                {{ tag.label }}
-                <button @click="removeTag(tag)"
-                        class="hover:text-blue-800">
-                  <X class="w-3 h-3"/>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div >
-        <Vditor>
-        </Vditor>
-      </div>
-    </div>
-  </PostModal>
-
+  <!-- 简化后的 PostModal 使用 -->
+  <PostModal v-model="showPostModal" @publish="handlePostPublished" />
 </template>
 
 <script setup>
-import {ref, computed, onMounted, nextTick, watch, onUnmounted} from 'vue'
-import LoginCard from '../../components/forum/NowLoginCard.vue'
-import PostCard from '../../components/forum/PostCard.vue'
+import { ref, computed, onMounted, nextTick, watch, onUnmounted } from "vue";
+import { tags } from "../../api/tags";
+import { blog } from "../../api/blog";
+import LoginCard from "../../components/forum/NowLoginCard.vue";
+import PostCard from "../../components/forum/PostCard.vue";
 import {
   FileText,
   Users,
@@ -270,204 +196,208 @@ import {
   Search,
   PencilLine,
   ChevronDown,
-  X
-} from 'lucide-vue-next'
+  X,
+} from "lucide-vue-next";
 import TopicListButton from "../../components/topics/TopicListButton.vue";
-import FilterTags from '../../components/forum/TagList.vue'
-import MustReadList from '../../components/forum/MustReadList.vue'
-import PostModal from '../../components/forum/PostModal.vue'
+import FilterTags from "../../components/forum/TagList.vue";
+import MustReadList from "../../components/forum/MustReadList.vue";
+import PostModal from "../../components/forum/PostModal.vue";
+import { message } from "ant-design-vue"; // 引入消息提示组件
 
-const selectedCard = ref(null)
+const selectedCard = ref(null);
 
 const cards = [
   {
-    title: '求职面试',
+    title: "求职面试",
     icon: FileText,
-    iconColor: 'text-[#2196f3]',
-    activeColor: '#2196f3'
+    iconColor: "text-[#2196f3]",
+    activeColor: "#2196f3",
   },
   {
-    title: '职场与内推',
+    title: "职场与内推",
     icon: Users,
-    iconColor: 'text-[#4caf50]',
-    activeColor: '#4caf50'
+    iconColor: "text-[#4caf50]",
+    activeColor: "#4caf50",
   },
   {
-    title: '技术交流',
+    title: "技术交流",
     icon: MessageCircle,
-    iconColor: 'text-[#9c27b0]',
-    activeColor: '#9c27b0'
+    iconColor: "text-[#9c27b0]",
+    activeColor: "#9c27b0",
   },
   {
-    title: '学习分享',
+    title: "学习分享",
     icon: Share2,
-    iconColor: 'text-[#ff9800]',
-    activeColor: '#ff9800'
+    iconColor: "text-[#ff9800]",
+    activeColor: "#ff9800",
   },
   {
-    title: '意见反馈',
+    title: "意见反馈",
     icon: PenLine,
-    iconColor: 'text-[#00bcd4]',
-    activeColor: '#00bcd4'
-  }
-]
+    iconColor: "text-[#00bcd4]",
+    activeColor: "#00bcd4",
+  },
+];
 
 const selectCard = (index) => {
-  selectedCard.value = selectedCard.value === index ? null : index
-}
+  selectedCard.value = selectedCard.value === index ? null : index;
+};
 
 // 标签页数据
 const tabs = [
-  {id: 'latest', name: '最新'},
-  {id: 'hot', name: '最热'},
-  {id: 'following', name: '关注'}
+  { id: "latest", name: "最新" },
+  { id: "hot", name: "最热" },
+  { id: "following", name: "关注" },
 ];
 
-const currentTab = ref('latest');
+const currentTab = ref("latest");
 
 // 文章列表数据
 const articles = ref([
   {
     id: 1,
-    avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
+    avatar:
+      "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
     title: "求助 | 非科班转码求助",
-    content: "大佬们，我是中上游985的非科班研究生，目前研一，研究方向和计算机沾点边，但关系不大，毕业想转码，老师管得严，要求发论文，放实习不太可能（如果在研一下发了文章，暑假去实习稍微能谈一下），目前在自学语言...",
+    content:
+      "大佬们，我是中上游985的非科班研究生，目前研一，研究方向和计算机沾点边，但关系不大，毕业想转码，老师管得严，要求发论文，放实习不太可能（如果在研一下发了文章，暑假去实习稍微能谈一下），目前在自学语言...",
     tags: [
-      {text: '求职', color: 'blue'},
-      {text: '秋招', color: 'purple'},
-      {text: '应届', color: 'cyan'}
+      { text: "求职", color: "blue" },
+      { text: "秋招", color: "purple" },
+      { text: "应届", color: "cyan" },
     ],
     likes: 12,
     views: 2700,
     comments: 75,
-    stars: 15
+    stars: 15,
   },
   {
     id: 2,
-    avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
+    avatar:
+      "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
     title: "分享 | 前端面试题总结",
-    content: "最近参加了几家大厂的面试，总结了一些常见的前端面试题，包括Vue、React、JavaScript基础等，希望对大家有帮助...",
+    content:
+      "最近参加了几家大厂的面试，总结了一些常见的前端面试题，包括Vue、React、JavaScript基础等，希望对大家有帮助...",
     tags: [
-      {text: '面试', color: 'pink'},
-      {text: '前端', color: 'orange'},
-      {text: '经验分享', color: 'green'}
+      { text: "面试", color: "pink" },
+      { text: "前端", color: "orange" },
+      { text: "经验分享", color: "green" },
     ],
     likes: 45,
     views: 3500,
     comments: 120,
-    stars: 89
+    stars: 89,
   },
   {
-    "id": 3,
-    "avatar": "https://pic.leetcode.cn/1699000395-IIuoAA-%E5%88%B6%E4%BD%9C%E7%81%B0%E8%89%B2%E8%83%8C%E6%99%AF.png",
-    "title": "干货 | JS性能优化技巧总结",
-    "content": "分享一些在项目中使用的JavaScript性能优化技巧，包括代码分片、懒加载等，希望能提高大家的代码效率。",
-    "tags": [
-      {"text": "性能优化", "color": "red"},
-      {"text": "前端", "color": "orange"}
+    id: 3,
+    avatar:
+      "https://pic.leetcode.cn/1699000395-IIuoAA-%E5%88%B6%E4%BD%9C%E7%81%B0%E8%89%B2%E8%83%8C%E6%99%AF.png",
+    title: "干货 | JS性能优化技巧总结",
+    content:
+      "分享一些在项目中使用的JavaScript性能优化技巧，包括代码分片、懒加载等，希望能提高大家的代码效率。",
+    tags: [
+      { text: "性能优化", color: "red" },
+      { text: "前端", color: "orange" },
     ],
-    "likes": 68,
-    "views": 4200,
-    "comments": 85,
-    "stars": 120
+    likes: 68,
+    views: 4200,
+    comments: 85,
+    stars: 120,
   },
   {
-    "id": 4,
-    "avatar": "https://pic.leetcode.cn/1699000423-IIuoHH-%E7%AE%80%E6%B4%81%E5%AE%8C%E6%95%B4.png",
-    "title": "总结 | Vue3 Composition API 核心用法",
-    "content": "学习了Vue3 Composition API的基本用法，并总结了其中一些值得注意的点，希望对学习Vue的同学有所帮助。",
-    "tags": [
-      {"text": "Vue3", "color": "blue"},
-      {"text": "前端", "color": "orange"},
-      {"text": "经验分享", "color": "green"}
+    id: 4,
+    avatar:
+      "https://pic.leetcode.cn/1699000423-IIuoHH-%E7%AE%80%E6%B4%81%E5%AE%8C%E6%95%B4.png",
+    title: "总结 | Vue3 Composition API 核心用法",
+    content:
+      "学习了Vue3 Composition API的基本用法，并总结了其中一些值得注意的点，希望对学习Vue的同学有所帮助。",
+    tags: [
+      { text: "Vue3", color: "blue" },
+      { text: "前端", color: "orange" },
+      { text: "经验分享", color: "green" },
     ],
-    "likes": 102,
-    "views": 6800,
-    "comments": 134,
-    "stars": 210
+    likes: 102,
+    views: 6800,
+    comments: 134,
+    stars: 210,
   },
   {
-    "id": 5,
-    "avatar": "https://pic.leetcode.cn/1699000447-IIuoBB-%E5%B0%8F%E5%8C%85%E6%94%BB%E7%95%A5.png",
-    "title": "教程 | 手把手带你实现拖拽组件",
-    "content": "最近实现了一个拖拽组件，在实现过程中踩了一些坑，这篇文章详细讲解了组件的核心逻辑及实现细节。",
-    "tags": [
-      {"text": "组件开发", "color": "purple"},
-      {"text": "前端", "color": "orange"},
-      {"text": "实践分享", "color": "teal"}
+    id: 5,
+    avatar:
+      "https://pic.leetcode.cn/1699000447-IIuoBB-%E5%B0%8F%E5%8C%85%E6%94%BB%E7%95%A5.png",
+    title: "教程 | 手把手带你实现拖拽组件",
+    content:
+      "最近实现了一个拖拽组件，在实现过程中踩了一些坑，这篇文章详细讲解了组件的核心逻辑及实现细节。",
+    tags: [
+      { text: "组件开发", color: "purple" },
+      { text: "前端", color: "orange" },
+      { text: "实践分享", color: "teal" },
     ],
-    "likes": 79,
-    "views": 5600,
-    "comments": 95,
-    "stars": 140
+    likes: 79,
+    views: 5600,
+    comments: 95,
+    stars: 140,
   },
   {
-    "id": 6,
-    "avatar": "https://pic.leetcode.cn/1699000470-IIuoCC-%E7%A7%BB%E5%8A%A8%E9%80%9F%E5%8A%9B.png",
-    "title": "学习笔记 | React性能优化方法论",
-    "content": "记录React项目中的性能优化过程，包括如何减少组件重渲染、虚拟化列表、useMemo和useCallback的合理使用等。",
-    "tags": [
-      {"text": "React", "color": "cyan"},
-      {"text": "性能优化", "color": "red"},
-      {"text": "前端", "color": "orange"}
+    id: 6,
+    avatar:
+      "https://pic.leetcode.cn/1699000470-IIuoCC-%E7%A7%BB%E5%8A%A8%E9%80%9F%E5%8A%9B.png",
+    title: "学习笔记 | React性能优化方法论",
+    content:
+      "记录React项目中的性能优化过程，包括如何减少组件重渲染、虚拟化列表、useMemo和useCallback的合理使用等。",
+    tags: [
+      { text: "React", color: "cyan" },
+      { text: "性能优化", color: "red" },
+      { text: "前端", color: "orange" },
     ],
-    "likes": 56,
-    "views": 3900,
-    "comments": 75,
-    "stars": 100
+    likes: 56,
+    views: 3900,
+    comments: 75,
+    stars: 100,
   },
   {
-    "id": 7,
-    "avatar": "https://pic.leetcode.cn/1699000503-IIuoDD-%E6%B5%85%E8%88%BD%E8%AF%BE%E5%A0%82.png",
-    "title": "盘点 | JavaScript中你可能忽略的陷阱",
-    "content": "JavaScript是一门非常灵活的语言，也存在许多容易忽略的陷阱，这篇文章列举了一些常见问题及解决方案。",
-    "tags": [
-      {"text": "JavaScript", "color": "yellow"},
-      {"text": "前端", "color": "orange"},
-      {"text": "实战", "color": "lime"}
+    id: 7,
+    avatar:
+      "https://pic.leetcode.cn/1699000503-IIuoDD-%E6%B5%85%E8%88%BD%E8%AF%BE%E5%A0%82.png",
+    title: "盘点 | JavaScript中你可能忽略的陷阱",
+    content:
+      "JavaScript是一门非常灵活的语言，也存在许多容易忽略的陷阱，这篇文章列举了一些常见问题及解决方案。",
+    tags: [
+      { text: "JavaScript", color: "yellow" },
+      { text: "前端", color: "orange" },
+      { text: "实战", color: "lime" },
     ],
-    "likes": 90,
-    "views": 6100,
-    "comments": 108,
-    "stars": 160
-  }
+    likes: 90,
+    views: 6100,
+    comments: 108,
+    stars: 160,
+  },
 ]);
 
-// 添加标签选项数据
-const filterTags = ref([
-  {text: '前端开发', color: 'blue'},
-  {text: '后端开发', color: 'green'},
-  {text: '面试经验', color: 'purple'},
-  {text: '实习', color: 'orange'},
-  {text: '校招', color: 'cyan'},
-  {text: '职业发展', color: 'magenta'},
-  {text: '算法', color: 'red'},
-  {text: '系统设计', color: 'volcano'},
-  {text: '开源项目', color: 'geekblue'},
-  {text: '前端框架', color: 'lightblue'},
-  {text: '微服务架构', color: 'lime'},
-  {text: '大数据处理', color: 'gold'},
-  {text: '机器学习', color: 'brown'},
-  {text: '深度学习', color: 'gray'},
-  {text: 'NLP', color: 'orange'},
-  {text: '云计算', color: 'teal'},
-  {text: 'DevOps', color: 'cyan'},
-  {text: '区块链', color: 'purple'},
-  {text: '嵌入式开发', color: 'green'},
-  {text: '性能优化', color: 'blue'},
-  {text: '软件测试', color: 'geekblue'},
-  {text: '项目管理', color: 'magenta'},
-  {text: '产品思维', color: 'volcano'},
-  {text: '数据分析', color: 'cyan'},
-  {text: '人工智能', color: 'red'},
-  {text: '图像识别', color: 'pink'},
-  {text: '网络安全', color: 'gold'},
-  {text: '操作系统', color: 'green'},
-  {text: '数据库优化', color: 'volcano'},
-  {text: 'Web3', color: 'lightpurple'},
-  {text: '创业经验', color: 'lime'},
-  {text: '开源贡献', color: 'geekblue'},
-]);
+// 修改标签选项数据的定义和初始化
+const filterTags = ref([]);
+
+// 修改获取标签的函数
+const fetchTags = async () => {
+  try {
+    const result = await tags.getTagsList();
+    if (result.code === 200) {
+      // 转换数据格式以匹配现有的使用方式
+      filterTags.value = result.data.map((tag) => ({
+        text: tag.name,
+        color: tag.color.toLowerCase(), // 确保颜色代码小写
+        id: tag.id,
+      }));
+    }
+  } catch (error) {
+    console.error("获取标签失败:", error);
+  }
+};
+
+// 修改 onMounted 钩子，添加标签数据获取
+onMounted(() => {
+  fetchTags(); // 获取标签数据
+});
 
 // 选中的标签
 const selectedTags = ref([]);
@@ -484,99 +414,85 @@ const toggleExpand = () => {
 const mustReadList = ref([
   {
     id: 1,
-    avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
-    title: '2024年前端面试路线图',
+    avatar:
+      "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
+    title: "2024年前端面试路线图",
     views: 12000,
     likes: 3200,
-    isRead: false
+    isRead: false,
   },
   {
     id: 2,
-    avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
-    title: 'Vue3 + TypeScript 完整项目实战',
+    avatar:
+      "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
+    title: "Vue3 + TypeScript 完整项目实战",
     views: 8500,
     likes: 2100,
-    isRead: true
+    isRead: true,
   },
   {
     id: 3,
-    avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
-    title: '零基础入门算法 - 系列教程',
+    avatar:
+      "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
+    title: "零基础入门算法 - 系列教程",
     views: 7800,
     likes: 1900,
-    isRead: false
+    isRead: false,
   },
   {
     id: 4,
-    avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
-    title: '后端开发必学的设计模式',
+    avatar:
+      "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
+    title: "后端开发必学的设计模式",
     views: 6500,
     likes: 1500,
-    isRead: true
+    isRead: true,
   },
   {
     id: 5,
-    avatar: "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
-    title: '深入理解 React 原理',
+    avatar:
+      "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
+    title: "深入理解 React 原理",
     views: 5900,
     likes: 1300,
-    isRead: false
-  }
-])
+    isRead: false,
+  },
+]);
 
 // 添加模态框控制状态
-const showPostModal = ref(false)
+const showPostModal = ref(false);
 
-// 添加文章分类和类型选项
-const postCategoryOptions = ref([
-  {label: '求职面试', value: 'job'},
-  {label: '技术交流', value: 'tech'},
-  {label: '学习分享', value: 'study'},
-  {label: '意见反馈', value: 'feedback'},
-]);
-
-const currentOpenDropdown = ref(null);
-
-const handleDropdownToggle = (dropdownId) => {
-  currentOpenDropdown.value = currentOpenDropdown.value === dropdownId ? null : dropdownId;
+// 添加发布成功的处理函数
+const handlePostPublished = () => {
+  // 可以在这里刷新文章列表
+  showPostModal.value = false;
 };
 
-const handlePostCategorySelect = (item) => {
-  console.log('所属话题:', item);
-};
-
-// 标题输入框焦点状态
-const isTitleFocused = ref(false);
-const postTitle = ref('');
-
-// 标签搜索相关
-const tagSearchQuery = ref('');
-const isTagSearchFocused = ref(false);
-const selectedSearchTags = ref([]);
-
-// 标签选项
-const allTags = ref([
-  {label: 'JavaScript', value: 'js'},
-  {label: 'Vue', value: 'vue'},
-  {label: 'React', value: 'react'},
-  {label: '前端开发', value: 'frontend'},
-  {label: '后端开发', value: 'backend'},
-  {label: '算法', value: 'algorithm'},
-  // ... 更多标签
-]);
+// 修改标签选项数据结构
+const allTags = computed(() => {
+  return filterTags.value.map((tag) => ({
+    label: tag.text,
+    value: tag.id,
+    color: tag.color,
+  }));
+});
 
 // 过滤标签 - 修改计算属性
 const filteredTags = computed(() => {
   if (!tagSearchQuery.value) {
     // 当搜索框为空时，返回所有未选择的标签
-    return allTags.value.filter(tag => 
-      !selectedSearchTags.value.some(selected => selected.value === tag.value)
+    return allTags.value.filter(
+      (tag) =>
+        !selectedSearchTags.value.some(
+          (selected) => selected.value === tag.value
+        )
     );
   }
   // 当有搜索内容时，在未选择的标签中进行搜索
-  return allTags.value.filter(tag => 
-    tag.label.toLowerCase().includes(tagSearchQuery.value.toLowerCase()) &&
-    !selectedSearchTags.value.some(selected => selected.value === tag.value)
+  return allTags.value.filter(
+    (tag) =>
+      tag.label.toLowerCase().includes(tagSearchQuery.value.toLowerCase()) &&
+      !selectedSearchTags.value.some((selected) => selected.value === tag.value)
   );
 });
 
@@ -584,7 +500,7 @@ const filteredTags = computed(() => {
 const addTag = (tag) => {
   if (selectedSearchTags.value.length < 8) {
     selectedSearchTags.value.push(tag);
-    tagSearchQuery.value = '';
+    tagSearchQuery.value = "";
     // 添加这一行来保持输入框的焦点
     document.querySelector('input[placeholder="搜索标签..."]')?.focus();
   }
@@ -592,34 +508,26 @@ const addTag = (tag) => {
 
 // 修改移除标签的逻辑，移除焦点相关代码
 const removeTag = (tag) => {
-  selectedSearchTags.value = selectedSearchTags.value.filter(t => t.value !== tag.value);
+  selectedSearchTags.value = selectedSearchTags.value.filter(
+    (t) => t.value !== tag.value
+  );
 };
 
 // 添加清空搜索功能
 const clearTagSearch = () => {
-  tagSearchQuery.value = '';
+  tagSearchQuery.value = "";
   // 保持焦点状态，这样下拉框不会关闭
   document.querySelector('input[placeholder="搜索标签..."]')?.focus();
 };
 
-// 添加点击外部关闭下拉框的处理函数
-const handleClickOutside = (event) => {
-  const tagSearchContainer = document.querySelector('.tag-search-container');
-  if (tagSearchContainer && !tagSearchContainer.contains(event.target)) {
-    isTagSearchFocused.value = false;
-  }
+// 添加编辑器ref
+const editorRef = ref(null);
+const vditorInstance = ref(null);
+
+// 添加编辑器挂载完成的处理函数
+const handleEditorMounted = (vdt) => {
+  vditorInstance.value = vdt;
 };
-
-// 在组件挂载时添加点击事件监听
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside);
-});
-
-// 在组件卸载时移除点击事件监听
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside);
-});
-
 </script>
 
 <style scoped>
@@ -744,4 +652,3 @@ onUnmounted(() => {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 </style>
-

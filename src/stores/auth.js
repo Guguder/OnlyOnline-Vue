@@ -1,76 +1,123 @@
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
 import { auth } from '../api/auth'
 import { message } from 'ant-design-vue'
 
-export const useAuthStore = defineStore('auth', {
-    state: () => ({
-        user: null,
-        token: localStorage.getItem('token') || null,
-        userInfo: null // 添加用户信息状态
-    }),
+export const useAuthStore = defineStore('auth', () => {
+  const isAuthenticated = ref(false)
+  const userInfo = ref(null)
+  const loading = ref(true)  // 添加 loading 状态
+  const error = ref(null)    // 添加 error 状态
 
-    actions: {
-        async login(credentials) {
-            try {
-                const response = await auth.login(credentials)
-                if (response.code === 200) {
-                    const token = response.data
-                    this.token = token
-                    localStorage.setItem('token', token)
-                    // 登录成功后立即获取用户信息
-                    await this.fetchUserInfo()
-                    message.success('登录成功')
-                    return response
-                } else {
-                    throw new Error(response.msg || '登录失败')
-                }
-            } catch (error) {
-                message.error(error.message || '登录失败')
-                throw error
-            }
-        },
-
-        // 修改获取用户信息的方法
-        async fetchUserInfo() {
-            try {
-                const response = await auth.getUserInfo()
-                if (response.code === 200) { // 改为判断 200
-                    this.userInfo = response.data
-                    console.log('获取到的用户信息：', response.data) // 添加这行打印
-                    return response.data
-                } else {
-                    throw new Error(response.msg || '获取用户信息失败')
-                }
-            } catch (error) {
-                console.error('获取用户信息失败：', error) // 添加错误打印
-                message.error(error.message || '获取用户信息失败')
-                throw error
-            }
-        },
-
-        // 新增初始化方法
-        async initialize() {
-            if (this.token) {
-                try {
-                    await this.fetchUserInfo()
-                } catch (error) {
-                    console.error('初始化时获取用户信息失败：', error)
-                }
-            }
-        },
-
-        // 更新登出方法，清除用户信息
-        logout() {
-            this.user = null
-            this.token = null
-            this.userInfo = null
-            localStorage.removeItem('token')
-        },
-    },
-
-    // 添加 getters
-    getters: {
-        isAuthenticated: (state) => !!state.token,
-        getUserInfo: (state) => state.userInfo
+  // 初始化检查登录状态
+  const checkAuthStatus = async () => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await fetch('/api/auth/status') // 替换为实际的API端点
+      if (!response.ok) throw new Error('Auth check failed')
+      const data = await response.json()
+      isAuthenticated.value = data.isAuthenticated
+      userInfo.value = data.userInfo
+    } catch (err) {
+      error.value = err.message
+      isAuthenticated.value = false
+      userInfo.value = null
+    } finally {
+      loading.value = false
     }
+  }
+
+  // 登录方法
+  const login = async (credentials) => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await auth.login(credentials)
+      if (response.code === 200) {
+        const token = response.data
+        localStorage.setItem('token', token)
+        await fetchUserInfo()
+        isAuthenticated.value = true  // 确保设置登录状态
+        message.success('登录成功')
+        return response
+      } else {
+        throw new Error(response.msg || '登录失败')
+      }
+    } catch (err) {
+      error.value = err.message
+      isAuthenticated.value = false
+      message.error(err.message || '登录失败')
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // 获取用户信息方法
+  const fetchUserInfo = async () => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await auth.getUserInfo()
+      if (response.code === 200) {
+        userInfo.value = response.data
+        isAuthenticated.value = true  // 如果成功获取用户信息，设置登录状态
+        console.log('获取到的用户信息：', response.data)
+        return response.data
+      } else {
+        throw new Error(response.msg || '获取用户信息失败')
+      }
+    } catch (err) {
+      error.value = err.message
+      isAuthenticated.value = false
+      userInfo.value = null
+      console.error('获取用户信息失败：', err)
+      message.error(err.message || '获取用户信息失败')
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // 初始化方法
+  const initialize = async () => {
+    if (localStorage.getItem('token')) {
+      try {
+        await fetchUserInfo()
+        isAuthenticated.value = true  // 初始化成功后设置登录状态
+      } catch (err) {
+        console.error('初始化时获取用户信息失败：', err)
+        isAuthenticated.value = false
+        localStorage.removeItem('token') // 如果获取用户信息失败，清除 token
+      }
+    } else {
+      isAuthenticated.value = false
+    }
+  }
+
+  // 登出方法
+  const logout = () => {
+    isAuthenticated.value = false
+    userInfo.value = null
+    error.value = null
+    localStorage.removeItem('token')
+  }
+
+  // 清除错误状态
+  const clearError = () => {
+    error.value = null
+  }
+
+  return {
+    isAuthenticated,
+    userInfo,
+    loading,
+    error,
+    login,
+    logout,
+    checkAuthStatus,
+    clearError,
+    initialize
+  }
 })

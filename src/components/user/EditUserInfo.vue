@@ -172,9 +172,9 @@
 import { ref, onMounted } from "vue";
 import zhCN from "ant-design-vue/es/date-picker/locale/zh_CN";
 import dayjs from "dayjs"; // 需要引入 dayjs 处理日期
-import { user } from "../api/user";
+import { user } from "../../api/user.js";
 import { message } from "ant-design-vue";
-import { cityOptions } from "../constants/cityData"; // 导入城市数据
+import { cityOptions } from "../../constants/cityData.js"; // 导入城市数据
 
 const props = defineProps({
   userData: {
@@ -183,6 +183,7 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["close", "update"]); // 添加 update 事件
 const locale = zhCN;
 
 // 用户信息
@@ -204,34 +205,33 @@ const userInfo = ref({
 
 // 在组件挂载时初始化用户数据
 onMounted(() => {
-  // 转换日期为 dayjs 对象
-  const birthDate = props.userData.birthDate
-    ? dayjs(props.userData.birthDate)
-    : null;
+  if (props.userData) {
+    console.log("接收到的用户数据：", props.userData); // 调试日志
 
-  userInfo.value = {
-    ...userInfo.value,
-    accountId: props.userData.accountId || "",
-    nickname: props.userData.nickname || "",
-    gender:
-      props.userData.gender === -1
-        ? "secret"
-        : props.userData.gender === 1
-        ? "male"
-        : "female",
-    birthDate: birthDate,
-    address: props.userData.address ? [props.userData.address] : [],
-    position: props.userData.position || "", // 添加职位字段
-    school: props.userData.school || "",
-    company: props.userData.company || "",
-    personalWebsite: props.userData.personalWebsite || "",
-    sign: props.userData.sign || "", // 个性签名使用 sign 字段
-    profileSummary: props.userData.profileSummary || "", // 个人简介使用 profileSummary 字段
-    avatar: props.userData.avatar || "",
-    tags: props.userData.tags || [], // 如果有标签数据的话
-  };
-
-  console.log("初始化的用户数据：", userInfo.value); // 用于调试
+    userInfo.value = {
+      ...userInfo.value,
+      accountId: props.userData.accountId || "",
+      nickname: props.userData.nickname || "",
+      gender:
+        props.userData.gender === -1
+          ? "secret"
+          : props.userData.gender === 1
+          ? "male"
+          : "female",
+      birthDate: props.userData.birthDate
+        ? dayjs(props.userData.birthDate)
+        : null,
+      address: props.userData.address ? [props.userData.address] : [],
+      position: props.userData.position || "",
+      school: props.userData.school || "",
+      company: props.userData.company || "",
+      personalWebsite: props.userData.personalWebsite || "",
+      sign: props.userData.sign || "",
+      profileSummary: props.userData.profileSummary || "",
+      avatar: props.userData.avatar || "",
+      tags: props.userData.tags || [],
+    };
+  }
 });
 
 // 标签选项
@@ -296,8 +296,6 @@ const handleSave = async () => {
     message.error("保存失败，请重试");
   }
 };
-
-const emit = defineEmits(["close", "update"]); // 添加 update 事件
 </script>
 
 <style scoped>

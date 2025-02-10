@@ -60,7 +60,7 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { BellOutlined, ThunderboltOutlined, ExpandAltOutlined, ShrinkOutlined } from '@ant-design/icons-vue';
-import { formatTimeAgo } from '../utils/dateUtils';
+import { formatTimeAgo } from '../../utils/dateUtils.js';
 
 const activeTab = ref('system');
 

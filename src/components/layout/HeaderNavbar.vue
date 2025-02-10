@@ -49,10 +49,10 @@
         </div>
 
         <!-- 用户未登录显示登录按钮，登录后显示头像 -->
-        <template v-if="!authStore.isAuthenticated">
+        <template v-if="!authStore.isAuthenticated || authStore.loading">
           <a-button @click="showLoginModal">登录</a-button>
         </template>
-        <template v-else>
+        <template v-else-if="authStore.userInfo">
           <a-dropdown :trigger="['click']">
             <a-avatar
               :size="32"
@@ -84,7 +84,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watchEffect } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import {
   SearchOutlined,
@@ -184,6 +184,16 @@ onMounted(() => {
       isExpanded.value = false;
     }
   });
+});
+
+// 在 script setup 中添加 watchEffect 以监听登录状态
+watchEffect(() => {
+  // 当 authStore.error 存在时，确保显示登录按钮
+  if (authStore.error) {
+    console.error("Authentication error:", authStore.error);
+    // 可以选择清理错误状态
+    // authStore.clearError();
+  }
 });
 </script>
 

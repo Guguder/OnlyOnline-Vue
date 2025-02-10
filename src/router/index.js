@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import PersonalCenter from '../views/PersonalCenter.vue'
+import PersonalCenter from '../views/user/PersonalCenter.vue'
 
 const routes = [
   {
@@ -38,7 +38,7 @@ const routes = [
   {
     path: '/notifications',
     name: 'notifications',
-    component: () => import('../views/NotificationsView.vue'),
+    component: () => import('../views/notice/NotificationsView.vue'),
     meta: { 
       requiresAuth: true,  // 需要登录才能访问
       title: '消息通知'
