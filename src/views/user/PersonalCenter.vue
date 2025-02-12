@@ -283,7 +283,7 @@
                 <div class="flex items-center gap-3">
                   <a-select
                     v-model:value="selectedYear"
-                    class="w-[100px]"
+                      class="w-[100px]"
                     :options="yearOptions"
                     @change="handleYearChange"
                   />

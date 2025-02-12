@@ -95,7 +95,7 @@
         class="w-full bg-white rounded-2xl p-2 flex items-center justify-between"
       >
         <div class="text-gray-900 font-medium pl-2">
-          共 {{ commentCount }} 条评论
+          共 {{ post.replyNum }} 条评论
         </div>
         <div class="flex gap-2">
           <button
@@ -131,9 +131,19 @@
       <div class="w-full bg-white rounded-2xl p-5">
         <CommentList
           :comments="comments"
+          :loading="commentsLoading"
           @reply="handleCommentReply"
           @like="handleCommentLike"
         />
+        <!-- 添加分页器 -->
+        <div class="mt-4 flex justify-center" v-if="total > 0">
+          <a-pagination
+            v-model:current="currentPage"
+            :total="total"
+            :pageSize="pageSize"
+            @change="handlePageChange"
+          />
+        </div>
       </div>
     </div>
 
@@ -151,7 +161,7 @@
           <div class="flex items-center justify-between">
             <span class="text-gray-500">参与人数</span>
             <div class="bg-gray-50 px-3 py-1 rounded text-gray-900 font-bold">
-              {{ statistics.participants }}
+              {{ post.participantNum }}
             </div>
           </div>
           <div class="flex items-center justify-between">
@@ -273,9 +283,10 @@ import PostDetailSkeleton from "../../components/skeleton/PostDetailSkeleton.vue
 const route = useRoute();
 const router = useRouter();
 
-// 修改post的默认值结构
+// 修改 post 的默认值结构，添加 accountId 字段
 const post = ref({
   id: "",
+  accountId: "", // 添加帖子作者的账号ID
   title: "",
   content: "",
   author: "",
@@ -287,6 +298,8 @@ const post = ref({
   isLiked: false,
   isFavorited: false,
   tags: [],
+  replyNum: 0, // 添加评论数量字段
+  participantNum: 1, // 添加参与人数字段
   statistics: {
     favorites: 0,
     participants: 0,
@@ -304,34 +317,43 @@ const fetchPostDetail = async () => {
     dataReady.value = false;
     vditorReady.value = false;
     const id = route.params.id;
-    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    // 1. 获取帖子详情
     const result = await blog.getPostDetail(id);
+    // 2. 获取评论列表以获取总数
+    const replyResult = await blog.getReplyList({
+      postId: id,
+      pageNumber: 1,
+      pageSize: 5,
+    });
+
     if (result.code === 200) {
       const data = result.data;
       post.value = {
+        ...post.value,
         id: data.id,
+        accountId: data.accountId,
         title: data.title,
         content: data.content,
         author: data.nickname,
         avatar: data.avatar,
         createTime: data.createTime,
-        // 处理可能为null的字段，使用默认值
+        replyNum: parseInt(data.replyNum) || 0,
+        participantNum: parseInt(data.participantNum) || 1,
         likes: data.thumbNum || 0,
         stars: data.favourNum || 0,
-        views: 3100, // 保持默认值
+        views: 3100,
         isLiked: data.isThumb || false,
         isFavorited: data.isFavour || false,
-        // 转换标签数据结构
         tags:
           data.tagsList?.map((tag) => ({
             text: tag.name,
             color: tag.color,
           })) || [],
-        // 统计信息
         statistics: {
           favorites: data.favourNum || 0,
           participants: data.replyList?.length || 0,
-          views: 3100, // 保持默认值
+          views: 3100,
         },
       };
 
@@ -367,7 +389,6 @@ const fetchPostDetail = async () => {
   } catch (error) {
     console.error("获取帖子详情失败:", error);
     message.error("获取帖子详情失败");
-    // 出错时也要关闭加载状态
     loading.value = false;
   }
 };
@@ -434,6 +455,12 @@ const emojis = [
   "👏",
 ];
 
+// 修改回复相关的状态，移除不必要的字段
+const currentReply = ref({
+  type: 1, // 固定为直接回复帖子
+  toAccountId: null,
+});
+
 // 点赞功能
 const toggleLike = withAuth(() => {
   isLiked.value = !isLiked.value;
@@ -457,31 +484,65 @@ const shareArticle = () => {
   console.log("分享文章");
 };
 
-// 回复功能
+// 简化显示回复框的方法
 const showReplyForm = () => {
+  currentReply.value = {
+    type: 1, // 固定为直接回复帖子
+    toAccountId: post.value.accountId, // 固定为帖子作者ID
+  };
+  replyContent.value = "";
   isReplyVisible.value = true;
 };
 
-// 添加隐藏回复框的方法，同时关闭表情选择器
-const hideReplyForm = () => {
-  isReplyVisible.value = false;
-  showEmojiPicker.value = false;
-  replyContent.value = ""; // 清空回复内容
-};
-
-// 添加提交回复的方法
-const handleSubmitReply = withAuth(() => {
+// 修改提交回复的方法，修复响应处理逻辑
+const handleSubmitReply = withAuth(async () => {
   if (!replyContent.value.trim()) {
+    message.warning("请输入回复内容");
     return;
   }
-  console.log("提交回复:", replyContent.value);
-  // TODO: 调用后端API提交回复
-  hideReplyForm(); // 提交后关闭回复框
+
+  try {
+    const replyData = {
+      postId: parseInt(route.params.id),
+      content: replyContent.value.trim(),
+      type: 1, // 固定为直接回复帖子
+      toAccountId: post.value.accountId, // 固定为帖子作者ID
+    };
+
+    console.log("发送回复数据:", replyData);
+    const result = await blog.sendReply(replyData);
+
+    if (result.code === 200) {
+      // 成功时直接处理，不再检查 result.msg
+      message.success("回复成功");
+      hideReplyForm();
+      // 重新加载评论列表，并回到第一页
+      currentPage.value = 1;
+      await fetchComments();
+    } else {
+      message.error("回复失败，请稍后重试");
+    }
+  } catch (error) {
+    console.error("回复发送失败:", error);
+    message.error("回复发送失败，请稍后重试");
+  }
 });
+
+// 移除评论回复处理方法，因为不再需要处理子评论
+const handleCommentReply = () => {
+  showReplyForm();
+};
 
 // 添加插入表情的方法
 const insertEmoji = (emoji) => {
   replyContent.value += emoji;
+};
+
+// 添加隐藏回复框的方法
+const hideReplyForm = () => {
+  isReplyVisible.value = false;
+  showEmojiPicker.value = false;
+  replyContent.value = "";
 };
 
 // 处理返回按钮点击
@@ -489,61 +550,69 @@ const handleBack = () => {
   router.push("/forum");
 };
 
+// 修改评论相关的数据定义
+const commentCount = computed(() => total.value);
+const comments = ref([]);
+
+// 修改获取评论列表的方法
+const fetchComments = async () => {
+  commentsLoading.value = true;
+  try {
+    const result = await blog.getReplyList({
+      postId: route.params.id,
+      pageNumber: currentPage.value,
+      pageSize: pageSize.value,
+    });
+
+    if (result.code === 200) {
+      // 修改这里的数据获取方式，直接使用 data 数组
+      comments.value =
+        result.data.data?.map((reply) => ({
+          id: reply.id,
+          author: reply.nickname,
+          avatar: reply.avatar || "default-avatar-url",
+          content: reply.content,
+          createTime: reply.createTime,
+          likes: reply.thumbNum || 0,
+          isLiked: reply.isThumb || false,
+          accountId: reply.accountId,
+        })) || [];
+      total.value = parseInt(result.data.total) || 0;
+    }
+  } catch (error) {
+    console.error("获取评论列表失败:", error);
+    message.error("获取评论列表失败");
+  } finally {
+    commentsLoading.value = false;
+  }
+};
+
+// 处理页码变化
+const handlePageChange = (page) => {
+  currentPage.value = page;
+  fetchComments();
+};
+
 // 添加评论相关的数据
-const commentCount = computed(() => post.value.statistics.participants);
 const commentSort = ref("hot"); // 'hot' 或 'new'
+const currentPage = ref(1);
+const pageSize = ref(5);
+const total = ref(0);
+const commentsLoading = ref(false);
 
-// 评论数据
-const comments = ref([
-  {
-    id: 1,
-    author: "张三",
-    avatar:
-      "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
-    content: "这篇文章写得很好!😀",
-    createTime: "2024-01-15 10:30",
-    likes: 12,
-    isLiked: false,
-    replies: [
-      {
-        id: 3,
-        author: "李四",
-        avatar:
-          "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
-        content: "同意楼上的观点",
-        createTime: "2024-01-15 11:00",
-        likes: 3,
-        isLiked: false,
-      },
-    ],
-  },
-  {
-    id: 2,
-    author: "王五",
-    avatar:
-      "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
-    content: "学到了很多，感谢分享！",
-    createTime: "2024-01-15 12:00",
-    likes: 8,
-    isLiked: false,
-    replies: [],
-  },
-]);
+onMounted(async () => {
+  loading.value = true;
+  dataReady.value = false;
+  vditorReady.value = false;
 
-// 处理评论回复
-const handleCommentReply = (comment) => {
-  showReplyForm();
-  replyContent.value = `@${comment.author} `;
-};
+  // 先滚动到顶部
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
 
-// 处理评论点赞
-const handleCommentLike = (comment) => {
-  comment.isLiked = !comment.isLiked;
-  comment.likes += comment.isLiked ? 1 : -1;
-};
-
-onMounted(() => {
-  console.log("帖子详情页面加载完成，ID:", route.params.id);
+  // 然后获取帖子详情
+  await Promise.all([fetchPostDetail(), fetchComments()]);
 });
 </script>
 

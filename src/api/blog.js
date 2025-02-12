@@ -23,5 +23,26 @@ export const blog = {
             url: `/blog/post/info/${id}`,
             method: 'get'
         })
+    },
+    // 发送回复
+    sendReply(data) {
+        return request({
+            url: '/reply',
+            method: 'post',
+            data
+        })
+    },
+    // 获取评论列表
+    getReplyList(params) {
+        return request({
+            url: '/reply/list',
+            method: 'get',
+            params: {
+                type: 1,
+                rootId: '',
+                pageSize: 5,
+                ...params
+            }
+        })
     }
 }
