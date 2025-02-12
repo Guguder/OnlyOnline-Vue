@@ -44,5 +44,9 @@ export const blog = {
                 ...params
             }
         })
+    },
+    // 获取子评论列表
+    getChildReplyList(replyId) {
+        return request.get(`/reply/child/list?replyId=${replyId}`);
     }
 }
