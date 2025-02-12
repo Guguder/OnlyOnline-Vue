@@ -15,7 +15,7 @@
             @click="selectCard(index)"
             :class="[
               'card-container transition-all duration-300',
-              selectedCard === index ? 'active' : '',
+              selectedCard === index + 1 ? 'active' : '',
             ]"
           >
             <div class="card-content">
@@ -24,14 +24,14 @@
                   :is="card.icon"
                   :class="[
                     'w-8 h-8',
-                    selectedCard === index ? 'text-white' : card.iconColor,
+                    selectedCard === index + 1 ? 'text-white' : card.iconColor,
                   ]"
                 />
               </div>
               <span
                 :class="[
                   'text-lg font-medium',
-                  selectedCard === index ? 'text-white' : 'text-gray-700',
+                  selectedCard === index + 1 ? 'text-white' : 'text-gray-700',
                 ]"
               >
                 {{ card.title }}
@@ -50,7 +50,7 @@
               @click="selectCard(index + 3)"
               :class="[
                 'card-container small-card transition-all duration-300 w-full',
-                selectedCard === index + 3 ? 'active' : '',
+                selectedCard === index + 4 ? 'active' : '',
               ]"
             >
               <div class="card-content">
@@ -59,7 +59,7 @@
                     :is="card.icon"
                     :class="[
                       'w-6 h-6',
-                      selectedCard === index + 3
+                      selectedCard === index + 4
                         ? 'text-white'
                         : card.iconColor,
                     ]"
@@ -68,7 +68,7 @@
                 <span
                   :class="[
                     'text-base font-medium',
-                    selectedCard === index + 3 ? 'text-white' : 'text-gray-700',
+                    selectedCard === index + 4 ? 'text-white' : 'text-gray-700',
                   ]"
                 >
                   {{ card.title }}
@@ -110,14 +110,19 @@
           <!-- 右侧搜索和按钮 -->
           <div class="flex items-center gap-4">
             <div class="relative w-[240px]">
-              <Search
-                class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"
-              />
               <input
+                v-model="searchTitle"
                 type="text"
                 placeholder="搜索文章"
-                class="w-full pl-10 pr-4 py-2 bg-[#F2F3F4] rounded-lg text-sm"
+                class="w-full px-4 pr-10 py-2 bg-[#F2F3F4] rounded-lg text-sm"
+                @keyup.enter="handleSearch"
               />
+              <button
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                @click="handleSearch"
+              >
+                <Search class="h-4 w-4" />
+              </button>
             </div>
             <button
               @click="showPostModal = true"
@@ -132,7 +137,7 @@
         <!-- 修改标签筛选区域 -->
         <div class="flex flex-wrop px-2 py-3 border-b border-gray-100">
           <div
-            class="max-w-[800px] transition-all duration-500 ease-in-out"
+            class="w-[800px] min-h-[42px] transition-all duration-500 ease-in-out"
             :style="{
               maxHeight: isExpanded ? '800px' : '42px',
               opacity: isExpanded ? '1' : '0.95',
@@ -163,6 +168,17 @@
               :post="article"
               class="w-full mb-2 last:mb-0"
             />
+
+            <!-- 添加分页组件 -->
+            <div class="flex justify-center mt-6">
+              <a-pagination
+                v-model:current="pageNumber"
+                v-model:pageSize="pageSize"
+                :total="total"
+                :show-total="(total) => `共 ${total} 条`"
+                @change="handlePageChange"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -203,8 +219,13 @@ import FilterTags from "../../components/forum/TagList.vue";
 import MustReadList from "../../components/forum/MustReadList.vue";
 import PostModal from "../../components/forum/PostModal.vue";
 import { message } from "ant-design-vue"; // 引入消息提示组件
+import { useRouter, useRoute } from "vue-router";
+import { Pagination as APagination } from "ant-design-vue";
 
-const selectedCard = ref(null);
+const router = useRouter();
+const route = useRoute();
+
+const selectedCard = ref(Number(route.params.category) || 1);
 
 const cards = [
   {
@@ -240,8 +261,30 @@ const cards = [
 ];
 
 const selectCard = (index) => {
-  selectedCard.value = selectedCard.value === index ? null : index;
+  const categoryId = index + 1;
+  selectedCard.value = categoryId;
+
+  // 重置分页到第一页
+  pageNumber.value = 1;
+
+  // 更新路由并获取对应分类的文章
+  router.push({
+    name: "Forum",
+    params: { category: categoryId },
+  });
 };
+
+// 添加路由监听
+watch(
+  () => route.params.category,
+  (newCategory) => {
+    if (newCategory) {
+      selectedCard.value = Number(newCategory);
+    } else {
+      selectedCard.value = 1; // 默认选中第一个
+    }
+  }
+);
 
 // 标签页数据
 const tabs = [
@@ -252,127 +295,66 @@ const tabs = [
 
 const currentTab = ref("latest");
 
-// 文章列表数据
-const articles = ref([
-  {
-    id: 1,
-    avatar:
-      "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
-    title: "求助 | 非科班转码求助",
-    content:
-      "大佬们，我是中上游985的非科班研究生，目前研一，研究方向和计算机沾点边，但关系不大，毕业想转码，老师管得严，要求发论文，放实习不太可能（如果在研一下发了文章，暑假去实习稍微能谈一下），目前在自学语言...",
-    tags: [
-      { text: "求职", color: "blue" },
-      { text: "秋招", color: "purple" },
-      { text: "应届", color: "cyan" },
-    ],
-    likes: 12,
-    views: 2700,
-    comments: 75,
-    stars: 15,
-  },
-  {
-    id: 2,
-    avatar:
-      "https://pic.leetcode.cn/1699000361-IIuoOH-%E9%9B%B6%E8%B5%B7%E6%AD%A5%E5%AD%A6%E7%AE%97%E6%B3%95.png",
-    title: "分享 | 前端面试题总结",
-    content:
-      "最近参加了几家大厂的面试，总结了一些常见的前端面试题，包括Vue、React、JavaScript基础等，希望对大家有帮助...",
-    tags: [
-      { text: "面试", color: "pink" },
-      { text: "前端", color: "orange" },
-      { text: "经验分享", color: "green" },
-    ],
-    likes: 45,
-    views: 3500,
-    comments: 120,
-    stars: 89,
-  },
-  {
-    id: 3,
-    avatar:
-      "https://pic.leetcode.cn/1699000395-IIuoAA-%E5%88%B6%E4%BD%9C%E7%81%B0%E8%89%B2%E8%83%8C%E6%99%AF.png",
-    title: "干货 | JS性能优化技巧总结",
-    content:
-      "分享一些在项目中使用的JavaScript性能优化技巧，包括代码分片、懒加载等，希望能提高大家的代码效率。",
-    tags: [
-      { text: "性能优化", color: "red" },
-      { text: "前端", color: "orange" },
-    ],
-    likes: 68,
-    views: 4200,
-    comments: 85,
-    stars: 120,
-  },
-  {
-    id: 4,
-    avatar:
-      "https://pic.leetcode.cn/1699000423-IIuoHH-%E7%AE%80%E6%B4%81%E5%AE%8C%E6%95%B4.png",
-    title: "总结 | Vue3 Composition API 核心用法",
-    content:
-      "学习了Vue3 Composition API的基本用法，并总结了其中一些值得注意的点，希望对学习Vue的同学有所帮助。",
-    tags: [
-      { text: "Vue3", color: "blue" },
-      { text: "前端", color: "orange" },
-      { text: "经验分享", color: "green" },
-    ],
-    likes: 102,
-    views: 6800,
-    comments: 134,
-    stars: 210,
-  },
-  {
-    id: 5,
-    avatar:
-      "https://pic.leetcode.cn/1699000447-IIuoBB-%E5%B0%8F%E5%8C%85%E6%94%BB%E7%95%A5.png",
-    title: "教程 | 手把手带你实现拖拽组件",
-    content:
-      "最近实现了一个拖拽组件，在实现过程中踩了一些坑，这篇文章详细讲解了组件的核心逻辑及实现细节。",
-    tags: [
-      { text: "组件开发", color: "purple" },
-      { text: "前端", color: "orange" },
-      { text: "实践分享", color: "teal" },
-    ],
-    likes: 79,
-    views: 5600,
-    comments: 95,
-    stars: 140,
-  },
-  {
-    id: 6,
-    avatar:
-      "https://pic.leetcode.cn/1699000470-IIuoCC-%E7%A7%BB%E5%8A%A8%E9%80%9F%E5%8A%9B.png",
-    title: "学习笔记 | React性能优化方法论",
-    content:
-      "记录React项目中的性能优化过程，包括如何减少组件重渲染、虚拟化列表、useMemo和useCallback的合理使用等。",
-    tags: [
-      { text: "React", color: "cyan" },
-      { text: "性能优化", color: "red" },
-      { text: "前端", color: "orange" },
-    ],
-    likes: 56,
-    views: 3900,
-    comments: 75,
-    stars: 100,
-  },
-  {
-    id: 7,
-    avatar:
-      "https://pic.leetcode.cn/1699000503-IIuoDD-%E6%B5%85%E8%88%BD%E8%AF%BE%E5%A0%82.png",
-    title: "盘点 | JavaScript中你可能忽略的陷阱",
-    content:
-      "JavaScript是一门非常灵活的语言，也存在许多容易忽略的陷阱，这篇文章列举了一些常见问题及解决方案。",
-    tags: [
-      { text: "JavaScript", color: "yellow" },
-      { text: "前端", color: "orange" },
-      { text: "实战", color: "lime" },
-    ],
-    likes: 90,
-    views: 6100,
-    comments: 108,
-    stars: 160,
-  },
-]);
+// 文章列表相关状态 - 移动到顶部并保持简洁
+const articles = ref([]);
+const pageNumber = ref(1);
+const pageSize = ref(10);
+const total = ref(0);
+const loading = ref(false);
+
+// 添加搜索相关状态
+const searchTitle = ref("");
+
+// 获取文章列表
+const fetchArticles = async (category) => {
+  try {
+    loading.value = true;
+    const result = await blog.getPostList({
+      category: category,
+      pageNumber: pageNumber.value,
+      pageSize: pageSize.value,
+      title: searchTitle.value, // 添加标题搜索参数
+    });
+
+    if (result.code === 200) {
+      const { data: pageData } = result;
+      articles.value = pageData.data.map((item) => ({
+        id: item.id,
+        avatar: item.avatar,
+        title: item.title,
+        content: item.content,
+        tags: item.tagsList.map((tag) => ({
+          text: tag.name,
+          color: tag.color.toLowerCase(),
+        })),
+        likes: item.thumbNum || 0,
+        views: 0, // API中没有这个字段
+        comments: item.replyList?.length || 0,
+        stars: item.favourNum || 0,
+        createTime: item.createTime,
+        isAnonymous: item.isAnonymous === 1,
+        nickname: item.nickname,
+      }));
+      total.value = parseInt(pageData.total);
+    }
+  } catch (error) {
+    console.error("获取文章列表失败:", error);
+    message.error("获取文章列表失败");
+  } finally {
+    loading.value = false;
+  }
+};
+
+// 添加搜索处理函数，添加防抖
+let searchTimer;
+const handleSearch = () => {
+  if (searchTimer) clearTimeout(searchTimer);
+
+  searchTimer = setTimeout(() => {
+    pageNumber.value = 1; // 重置到第一页
+    fetchArticles(selectedCard.value);
+  }, 300);
+};
 
 // 修改标签选项数据的定义和初始化
 const filterTags = ref([]);
@@ -528,6 +510,31 @@ const vditorInstance = ref(null);
 const handleEditorMounted = (vdt) => {
   vditorInstance.value = vdt;
 };
+
+// 监听分类变化
+watch(
+  () => route.params.category,
+  (newCategory) => {
+    if (newCategory) {
+      fetchArticles(newCategory);
+    } else {
+      fetchArticles(1); // 默认加载第一个分类
+    }
+  },
+  { immediate: true }
+);
+
+// 分页相关逻辑
+const handlePageChange = (page, pageSize) => {
+  pageNumber.value = page;
+  pageSize.value = pageSize;
+  fetchArticles(selectedCard.value);
+};
+
+// 监听分页变化
+watch([pageNumber, pageSize], () => {
+  fetchArticles(selectedCard.value);
+});
 </script>
 
 <style scoped>
@@ -650,5 +657,39 @@ const handleEditorMounted = (vdt) => {
 /* 修改动画线条的过渡效果 */
 .bg-purple-500 {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 添加分页样式 */
+:deep(.ant-pagination) {
+  margin: 16px 0;
+}
+
+:deep(.ant-pagination-item-active) {
+  border-color: #9333ea;
+
+  a {
+    color: #9333ea;
+  }
+}
+
+:deep(.ant-pagination-item:hover) {
+  border-color: #9333ea;
+
+  a {
+    color: #9333ea;
+  }
+}
+
+/* 添加搜索按钮悬停效果 */
+.search-button:hover {
+  @apply text-gray-600;
+}
+
+/* 添加标签区域的样式 */
+.w-[800px] {
+  /* 防止内容加载时的布局抖动 */
+  overflow: hidden;
+  width: 800px;
+  min-height: 42px;
 }
 </style>

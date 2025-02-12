@@ -19,10 +19,12 @@ const routes = [
     meta: { menu: '/topics' }
   },
   {
-    path: '/forum',
-    name: 'forum',
+    path: '/forum/:category?', // 可选参数，默认为1
+    name: 'Forum',
     component: () => import('../views/forum/ForumView.vue'),
-    meta: { menu: '/forum' }
+    props: (route) => ({
+      selectedCategory: Number(route.params.category) || 1
+    }),
   },
   {
     path: '/about',
@@ -33,7 +35,7 @@ const routes = [
   {
     path: '/post/:id',
     name: 'PostDetail',
-    component: () => import('../views/topics/PostDetailView.vue')
+    component: () => import('../views/forum/PostDetailView.vue')
   },
   {
     path: '/notifications',

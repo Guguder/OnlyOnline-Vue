@@ -323,7 +323,7 @@ const publishPost = async () => {
       isAnonymous: isAnonymous.value ? 1 : 0,
       tagsList: selectedTags.value.map((tag) => Number(tag.value)),
       title: postTitle.value.trim(),
-      type: selectedCategory.value.value,
+      category: selectedCategory.value.value, // 修改这里：从 type 改为 category
       content: editorContent.trim(),
     };
 

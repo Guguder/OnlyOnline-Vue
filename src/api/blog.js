@@ -8,5 +8,20 @@ export const blog = {
             method: 'post',
             data
         })
+    },
+    // 获取文章列表
+    getPostList(params) {
+        return request({
+            url: '/blog/post/list',
+            method: 'get',
+            params
+        })
+    },
+    // 获取帖子详情
+    getPostDetail(id) {
+        return request({
+            url: `/blog/post/info/${id}`,
+            method: 'get'
+        })
     }
 }
