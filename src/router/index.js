@@ -33,9 +33,10 @@ const routes = [
     meta: { menu: '/about' }
   },
   {
-    path: '/post/:id',
+    path: '/forum/post/:id',  // 确保路径格式正确
     name: 'PostDetail',
-    component: () => import('../views/forum/PostDetailView.vue')
+    component: () => import('../views/forum/PostDetailView.vue'),
+    props: true  // 启用 props 传递参数
   },
   {
     path: '/notifications',

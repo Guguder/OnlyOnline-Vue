@@ -90,10 +90,18 @@ const props = defineProps({
 });
 
 const goToDetail = () => {
-  router.push({
-    name: "PostDetail",
-    params: { id: props.post.id },
-  });
+  if (!props.post?.id) {
+    console.error("帖子ID不存在");
+    return;
+  }
+
+  router
+    .push({
+      path: `/forum/post/${props.post.id}`,
+    })
+    .catch((err) => {
+      console.error("路由跳转失败:", err);
+    });
 };
 </script>
 

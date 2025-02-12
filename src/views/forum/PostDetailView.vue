@@ -1,9 +1,11 @@
 <template>
+  <PostDetailSkeleton v-show="loading" />
   <div
+    v-show="!loading"
     class="w-screen min-h-screen flex justify-center gap-[20px] mt-[20px] mb-[40px]"
   >
     <!-- 左侧内容区域 -->
-    <div class="w-[700px] flex flex-col gap-5">
+    <div class="w-[700px] flex flex-col gap-2">
       <!-- 文章详情卡片 -->
       <div class="w-full bg-white rounded-2xl">
         <!-- 移动页头到卡片内部 -->
@@ -24,7 +26,7 @@
           </a-breadcrumb>
         </div>
         <div class="mx-5 h-[1px] bg-[#E5E5E5]"></div>
-        <div class="p-6">
+        <div class="px-5 pt-6 pb-2">
           <h1 class="text-2xl font-bold text-gray-900 mb-4">
             {{ post.title }}
           </h1>
@@ -44,7 +46,7 @@
           </div>
 
           <!-- 底部数据 -->
-          <div class="flex items-center justify-between mt-8 pt-4 border-t">
+          <div class="flex items-center justify-between mt-6 pt-2 border-t">
             <div class="flex items-center">
               <!-- 点赞按钮 -->
               <button
@@ -53,7 +55,7 @@
                 :class="post.isLiked ? 'text-blue-500' : 'text-gray-500'"
               >
                 <ThumbsUp
-                  class="w-5 h-5"
+                  class="w-4 h-4"
                   :fill="post.isLiked ? 'currentColor' : 'none'"
                 />
                 <span class="text-[15px]">{{ formatNumber(post.likes) }}</span>
@@ -65,14 +67,14 @@
                 :class="post.isFavorited ? 'text-yellow-500' : 'text-gray-500'"
               >
                 <Star
-                  class="w-5 h-5"
+                  class="w-4 h-4"
                   :fill="post.isFavorited ? 'currentColor' : 'none'"
                 />
                 <span class="text-[15px]">收藏</span>
               </button>
               <!-- 分享按钮 -->
               <button @click="shareArticle" class="action-btn text-gray-500">
-                <Share2 class="w-5 h-5" />
+                <Share2 class="w-4 h-4" />
                 <span class="text-[15px]">分享</span>
               </button>
             </div>
@@ -90,7 +92,7 @@
 
       <!-- 评论导航 -->
       <div
-        class="w-full bg-white rounded-2xl p-3 flex items-center justify-between"
+        class="w-full bg-white rounded-2xl p-2 flex items-center justify-between"
       >
         <div class="text-gray-900 font-medium pl-2">
           共 {{ commentCount }} 条评论
@@ -243,10 +245,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, computed } from "vue";
+import { ref, onMounted, computed, nextTick } from "vue"; // 添加 computed 导入
 import { useRoute, useRouter } from "vue-router";
 import {
-  Eye,
   ThumbsUp,
   Star,
   Share2,
@@ -258,67 +259,144 @@ import {
   Flame,
   TrendingUp,
   Clock,
-  History, // 添加新的图标
+  History,
 } from "lucide-vue-next";
 import { formatNumber } from "../../utils/format.js";
-import "vditor/dist/index.css";
-import Vditor from "vditor";
 import CommentList from "../../components/comment/CommentList.vue";
 import { withAuth } from "../../utils/authGuard.js";
-import blog from "../../api/blog.js"; // 假设你有一个 blog API 模块
-import { message } from "ant-design-vue"; // 假设你使用了 ant-design-vue
+import { blog } from "../../api/blog";
+import Vditor from "vditor";
+import "vditor/dist/index.css";
+import { message } from "ant-design-vue";
+import PostDetailSkeleton from "../../components/skeleton/PostDetailSkeleton.vue";
 
 const route = useRoute();
 const router = useRouter();
-const post = ref(null);
 
-// 获取帖子详情
+// 修改post的默认值结构
+const post = ref({
+  id: "",
+  title: "",
+  content: "",
+  author: "",
+  avatar: "",
+  createTime: "",
+  likes: 0,
+  stars: 0,
+  views: 3100, // 保留默认值，因为API中没有这个字段
+  isLiked: false,
+  isFavorited: false,
+  tags: [],
+  statistics: {
+    favorites: 0,
+    participants: 0,
+    views: 3100, // 保留默认值
+  },
+});
+
+const loading = ref(true);
+const vditorReady = ref(false);
+const dataReady = ref(false);
+
+// 修改获取帖子详情的方法
 const fetchPostDetail = async () => {
   try {
-    const result = await blog.getPostDetail(route.params.id);
+    dataReady.value = false;
+    vditorReady.value = false;
+    const id = route.params.id;
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    const result = await blog.getPostDetail(id);
     if (result.code === 200) {
-      // 合并API返回的数据和默认数据
+      const data = result.data;
       post.value = {
-        ...result.data,
-        // 使用API返回的数据
-        id: result.data.id,
-        title: result.data.title,
-        content: result.data.content,
-        author: result.data.nickname,
-        avatar: result.data.avatar,
-        createTime: result.data.createTime,
-        likes: result.data.thumbNum || 0,
-        stars: result.data.favourNum || 0,
-        tags: result.data.tagsList.map((tag) => ({
-          text: tag.name,
-          color: tag.color,
-        })),
-
-        // 使用假数据补充缺失的字段
-        views: 3100,
-        comments: result.data.replyList?.length || 0,
+        id: data.id,
+        title: data.title,
+        content: data.content,
+        author: data.nickname,
+        avatar: data.avatar,
+        createTime: data.createTime,
+        // 处理可能为null的字段，使用默认值
+        likes: data.thumbNum || 0,
+        stars: data.favourNum || 0,
+        views: 3100, // 保持默认值
+        isLiked: data.isThumb || false,
+        isFavorited: data.isFavour || false,
+        // 转换标签数据结构
+        tags:
+          data.tagsList?.map((tag) => ({
+            text: tag.name,
+            color: tag.color,
+          })) || [],
+        // 统计信息
         statistics: {
-          favorites: result.data.favourNum || 0,
-          participants: result.data.replyList?.length || 0,
-          views: 3100,
+          favorites: data.favourNum || 0,
+          participants: data.replyList?.length || 0,
+          views: 3100, // 保持默认值
         },
-        isLiked: result.data.isThumb || false,
-        isFavorited: result.data.isFavour || false,
       };
 
-      // 初始化 Vditor 预览
-      nextTick(() => {
-        Vditor.preview(
-          document.getElementById("vditor-preview"),
-          post.value.content
-        );
-      });
+      dataReady.value = true;
+
+      // 使用 nextTick 确保 DOM 更新后再初始化 Vditor
+      await nextTick();
+      const vditorElement = document.getElementById("vditor-preview");
+      if (vditorElement) {
+        try {
+          await Vditor.preview(vditorElement, data.content, {
+            markdown: {
+              breaks: true,
+            },
+            after: () => {
+              vditorReady.value = true;
+              checkLoadingStatus();
+            },
+          });
+        } catch (error) {
+          console.error("Vditor preview error:", error);
+          // 即使 Vditor 出错也允许显示其他内容
+          vditorReady.value = true;
+          checkLoadingStatus();
+        }
+      } else {
+        console.error("Vditor element not found");
+        // 如果找不到 Vditor 元素也允许显示其他内容
+        vditorReady.value = true;
+        checkLoadingStatus();
+      }
     }
   } catch (error) {
     console.error("获取帖子详情失败:", error);
     message.error("获取帖子详情失败");
+    // 出错时也要关闭加载状态
+    loading.value = false;
   }
 };
+
+// 检查加载状态
+const checkLoadingStatus = () => {
+  if (dataReady.value && vditorReady.value) {
+    // 添加短暂延迟确保平滑过渡
+    setTimeout(() => {
+      loading.value = false;
+    }, 100);
+  }
+};
+
+// 在组件挂载时获取数据
+onMounted(async () => {
+  loading.value = true;
+  dataReady.value = false;
+  vditorReady.value = false;
+
+  // 先滚动到顶部
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+
+  // 然后获取帖子详情
+  await fetchPostDetail();
+});
 
 // 添加统计数据
 const statistics = computed(() => ({
@@ -412,7 +490,7 @@ const handleBack = () => {
 };
 
 // 添加评论相关的数据
-const commentCount = ref(2);
+const commentCount = computed(() => post.value.statistics.participants);
 const commentSort = ref("hot"); // 'hot' 或 'new'
 
 // 评论数据
@@ -464,9 +542,8 @@ const handleCommentLike = (comment) => {
   comment.likes += comment.isLiked ? 1 : -1;
 };
 
-// 后续可以在这里调用API获取文章详情
 onMounted(() => {
-  fetchPostDetail();
+  console.log("帖子详情页面加载完成，ID:", route.params.id);
 });
 </script>
 
@@ -477,6 +554,8 @@ onMounted(() => {
 /* 添加 Vditor 预览样式调整 */
 :deep(.vditor-reset) {
   padding: 0;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 /* 简化的按钮样式 */
@@ -502,5 +581,11 @@ onMounted(() => {
 /* 添加表情选择器样式 */
 .grid-cols-8 {
   grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+
+.prose {
+  max-width: none;
+  color: #374151;
+  line-height: 1.6;
 }
 </style>
