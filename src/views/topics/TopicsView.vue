@@ -56,7 +56,7 @@
                     stroke-linejoin="round"
                   />
                   <path
-                    d="M19 14h-4a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1Z"
+                    d="M19 14h-4a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1Z"
                     stroke="currentColor"
                     stroke-width="2"
                     stroke-linecap="round"
@@ -159,7 +159,8 @@ import QuestionBank from "../../components/topics/TopicsBank.vue";
 import RankingList from "../../components/forum/RankingList.vue";
 import ProblemList from "../../components/topics/TopicList.vue";
 import { Search, Shuffle, CheckCircle2, Circle, Lock } from "lucide-vue-next";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { getBankList } from '../../api/bank';
 
 const problems = ref([
   {
@@ -208,36 +209,39 @@ const problems = ref([
     type: "sql",
   },
 ]);
+// 修改 cardDataList 的定义为响应式引用
+const cardDataList = ref([]);
+
 // JSON 数据
-const cardDataList = [
-  {
-    icon: "TOP",
-    title: "面试经典 150 题",
-    description: "123",
-  },
-  {
-    icon: "NEW",
-    title: "高频算法精选",
-    description: "收录近几年面试的高频算法问题算法问题算法问题算法问题算法问题",
-  },
-  {
-    icon: "HOT",
-    title: "热门框架深度剖析",
-    description:
-      "从源码角度理解热门框架，提升核心竞争力心竞争力心竞争力心竞争力心竞争力",
-  },
-  {
-    icon: "JS",
-    title: "JavaScript 面试指南",
-    description:
-      "从基础到进阶，深入探讨 JavaScript 面试问题面试问题面试问题面试问题面试问题",
-  },
-  {
-    icon: "DB",
-    title: "数据库面试解析",
-    description: "系统性学习数据库基础与高级操作",
-  },
-];
+// const cardDataList = [
+//   {
+//     icon: "TOP",
+//     title: "面试经典 150 题",
+//     description: "123",
+//   },
+//   {
+//     icon: "NEW",
+//     title: "高频算法精选",
+//     description: "收录近几年面试的高频算法问题算法问题算法问题算法问题算法问题",
+//   },
+//   {
+//     icon: "HOT",
+//     title: "热门框架深度剖析",
+//     description:
+//       "从源码角度理解热门框架，提升核心竞争力心竞争力心竞争力心竞争力心竞争力",
+//   },
+//   {
+//     icon: "JS",
+//     title: "JavaScript 面试指南",
+//     description:
+//       "从基础到进阶，深入探讨 JavaScript 面试问题面试问题面试问题面试问题面试问题",
+//   },
+//   {
+//     icon: "DB",
+//     title: "数据库面试解析",
+//     description: "系统性学习数据库基础与高级操作",
+//   },
+// ];
 
 // 排行榜数据
 const rankingList = [
@@ -363,4 +367,19 @@ const selectedDifficulty = ref("");
 const selectedStatus = ref("");
 const selectedTag = ref("");
 const selectedQuestionSet = ref("");
+
+onMounted(async () => {
+  await fetchBankList();
+});
+
+const fetchBankList = async () => {
+  try {
+    const result = await getBankList();
+    if (result.code === 200) {
+      cardDataList.value = result.data.data;
+    }
+  } catch (error) {
+    console.error('获取题库列表失败:', error);
+  }
+};
 </script>

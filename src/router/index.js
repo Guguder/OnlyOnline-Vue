@@ -63,6 +63,11 @@ const routes = [
       hideNavAndFooter: true  // 已经设置了隐藏导航栏和页脚的标记
     }
   },
+  {
+    path: '/bank/detail/:id',
+    name: 'BankDetail',
+    component: () => import('../views/bank/BankDetailView.vue')
+  },
   // 添加通配符路由在最后
   {
     path: '/:pathMatch(.*)*',
@@ -71,8 +76,13 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes,
+  // 添加 scrollBehavior 配置
+  scrollBehavior(to, from, savedPosition) {
+    // 始终滚动到顶部
+    return { top: 0 }
+  }
 })
 
 export default router

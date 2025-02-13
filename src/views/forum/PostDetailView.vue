@@ -602,10 +602,16 @@ const hideReplyForm = () => {
   replyContent.value = "";
 };
 
-// 处理返回按钮点击
+// 修改处理返回按钮点击的方法
 const handleBack = () => {
-  router.push("/forum");
-};
+  // 如果有上一页历史记录，就返回上一页
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    // 如果没有历史记录（比如直接通过链接访问），则返回讨论页面
+    router.push('/forum')
+  }
+}
 
 // 修改评论相关的数据定义
 const commentCount = computed(() => total.value);
