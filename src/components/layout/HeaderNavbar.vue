@@ -62,17 +62,27 @@
             <template #overlay>
               <a-menu>
                 <a-menu-item key="profile" @click="handleProfileClick">
-                  <UserOutlined />
-                  <span>个人中心</span>
+                  <div class="menu-item-content">
+                    <UserOutlined />
+                    <span>个人中心</span>
+                  </div>
                 </a-menu-item>
-                <a-menu-item key="settings">
-                  <SettingOutlined />
-                  <span>设置</span>
+                <a-menu-item
+                  v-if="authStore.userInfo?.role === 0"
+                  key="backend"
+                  @click="goToBackend"
+                >
+                  <div class="menu-item-content">
+                    <SettingOutlined />
+                    <span>后台管理</span>
+                  </div>
                 </a-menu-item>
                 <a-menu-divider />
                 <a-menu-item key="logout" @click="handleLogout">
-                  <LogoutOutlined />
-                  <span>退出登录</span>
+                  <div class="menu-item-content">
+                    <LogoutOutlined />
+                    <span>退出登录</span>
+                  </div>
                 </a-menu-item>
               </a-menu>
             </template>
@@ -166,6 +176,10 @@ const handleProfileClick = () => {
 const handleLogout = () => {
   authStore.logout();
   router.push("/home");
+};
+
+const goToBackend = () => {
+  router.push("/backend");
 };
 
 // 监听路由变化
@@ -393,5 +407,22 @@ watchEffect(() => {
 
 :deep(.ant-dropdown-menu-item .anticon) {
   margin-right: 8px;
+}
+
+/* 添加新的样式 */
+.menu-item-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+:deep(.ant-dropdown-menu-item) {
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+:deep(.ant-dropdown-menu-item .anticon) {
+  margin-right: 0; /* 移除图标的默认右边距 */
+  font-size: 16px; /* 统一图标大小 */
 }
 </style>

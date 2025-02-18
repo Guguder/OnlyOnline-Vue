@@ -1,62 +1,27 @@
 <template>
-  <!-- 添加加载遮罩 -->
   <div v-if="isLoading" class="loading-overlay">
     <div class="loading-content">
-      <n-spin size="large" />
+      <a-spin size="large" />
       <span class="mt-4 text-gray-600">加载中...</span>
     </div>
   </div>
 
-  <!-- 主要内容 -->
-  <a-space v-show="!isLoading" direction="vertical" :style="containerStyle">
-    <a-layout style="width: 100%; min-height: 100vh">
-      <HeaderNavbar v-if="!hideNavigation" />
-
-      <a-layout-content :style="contentStyle">
-        <div class="content-container" :class="{ 'p-0': hideNavigation }">
-          <router-view />
-        </div>
-      </a-layout-content>
-
-      <a-layout-footer v-if="!hideNavigation">
-        <Footer />
-      </a-layout-footer>
-    </a-layout>
-    <login-modal />
-  </a-space>
+  <router-view v-show="!isLoading" />
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import { NSpin } from "naive-ui";
-import Footer from "./components/Footer.vue";
-import LoginModal from "./components/auth/LoginModal.vue";
-import HeaderNavbar from "./components/layout/HeaderNavbar.vue";
+import { ref, onMounted } from "vue";
+import { useAuthStore } from "./stores/auth";
 
-const route = useRoute();
 const isLoading = ref(true);
+const authStore = useAuthStore();
 
-// 计算属性来检查是否需要隐藏导航
-const hideNavigation = computed(() => route.meta.hideNavAndFooter);
-
-onMounted(() => {
-  // 添加一个短暂的延迟来确保路由元信息已经准备好
+onMounted(async () => {
+  await authStore.initialize(); // 在应用启动时初始化用户状态
   setTimeout(() => {
     isLoading.value = false;
   }, 300);
 });
-
-const containerStyle = {
-  width: "100%",
-  display: "block",
-  margin: 0,
-  padding: 0,
-};
-
-const contentStyle = {
-  backgroundColor: "#F5F5F7",
-};
 </script>
 
 <style>

@@ -1,13 +1,14 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { auth } from '../api/auth'
 import { message } from 'ant-design-vue'
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false)
-  const userInfo = ref(null)
+  const userInfo = ref(null) // 现在 userInfo 将包含 role 字段
   const loading = ref(true)  // 添加 loading 状态
   const error = ref(null)    // 添加 error 状态
+  const initialized = ref(false)  // 添加初始化标志
 
   // 初始化检查登录状态
   const checkAuthStatus = async () => {
@@ -80,8 +81,10 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  // 初始化方法
+  // 修改初始化方法
   const initialize = async () => {
+    if (initialized.value) return // 如果已经初始化过，直接返回
+    
     if (localStorage.getItem('token')) {
       try {
         await fetchUserInfo()
@@ -94,6 +97,8 @@ export const useAuthStore = defineStore('auth', () => {
     } else {
       isAuthenticated.value = false
     }
+    
+    initialized.value = true  // 标记初始化完成
   }
 
   // 登出方法
@@ -109,6 +114,9 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
   }
 
+  // 添加判断是否为管理员的 getter
+  const isAdmin = computed(() => userInfo.value?.role === 0)
+
   return {
     isAuthenticated,
     userInfo,
@@ -118,6 +126,8 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     checkAuthStatus,
     clearError,
-    initialize
+    initialize,
+    isAdmin,
+    initialized,  // 导出初始化状态
   }
 })
