@@ -154,13 +154,13 @@
 </template>
 
 <script setup>
-import TopicListButton from "../../components/topics/TopicListButton.vue";
-import QuestionBank from "../../components/topics/TopicsBank.vue";
-import RankingList from "../../components/forum/RankingList.vue";
-import ProblemList from "../../components/topics/TopicList.vue";
+import TopicListButton from "../../../components/topics/TopicListButton.vue";
+import QuestionBank from "../../../components/topics/TopicsBank.vue";
+import RankingList from "../../../components/forum/RankingList.vue";
+import ProblemList from "../../../components/topics/TopicList.vue";
 import { Search, Shuffle, CheckCircle2, Circle, Lock } from "lucide-vue-next";
 import { ref, onMounted } from "vue";
-import { getBankList } from '../../api/bank';
+import { getBankList } from '../../../api/bank.js';
 
 const problems = ref([
   {

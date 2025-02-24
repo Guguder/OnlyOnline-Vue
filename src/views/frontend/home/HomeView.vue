@@ -76,8 +76,8 @@
 
 <script setup>
 import {LeftOutlined, RightOutlined} from '@ant-design/icons-vue';
-import CustomCalendar from '../../components/home/Calendar.vue';
-import ArticleCard from '../../components/home/HomePostCard.vue';
+import CustomCalendar from '../../../components/home/Calendar.vue';
+import ArticleCard from '../../../components/home/HomePostCard.vue';
 import { ref } from 'vue';
 
 // 修改为数组格式的模拟数据

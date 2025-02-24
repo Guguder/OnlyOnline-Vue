@@ -277,14 +277,14 @@ import {
   Clock,
   History,
 } from "lucide-vue-next";
-import {formatNumber} from "../../utils/format.js";
-import CommentList from "../../components/comment/CommentList.vue";
-import {withAuth} from "../../utils/authGuard.js";
-import {blog} from "../../api/blog";
+import {formatNumber} from "../../../utils/format.js";
+import CommentList from "../../../components/comment/CommentList.vue";
+import {withAuth} from "../../../utils/authGuard.js";
+import {blog} from "../../../api/blog.js";
 import Vditor from "vditor";
 import "vditor/dist/index.css";
 import {message} from "ant-design-vue";
-import PostDetailSkeleton from "../../components/skeleton/PostDetailSkeleton.vue";
+import PostDetailSkeleton from "../../../components/skeleton/PostDetailSkeleton.vue";
 
 const route = useRoute();
 const router = useRouter();

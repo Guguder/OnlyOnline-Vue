@@ -416,10 +416,10 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import * as echarts from "echarts";
-import UserInteractions from "../../components/user/UserInteractions.vue";
-import EditProfile from "../../components/user/EditUserInfo.vue";
-import ContributionPlot from "../../components/user/ContributionPlot.vue";
-import { useAuthStore } from "../../stores/auth.js";
+import UserInteractions from "../../../components/user/UserInteractions.vue";
+import EditProfile from "../../../components/user/EditUserInfo.vue";
+import ContributionPlot from "../../../components/user/ContributionPlot.vue";
+import { useAuthStore } from "../../../stores/auth.js";
 
 // 解题进度数据
 const easyProgress = ref({

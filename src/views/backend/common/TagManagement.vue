@@ -5,121 +5,104 @@
     </div>
 
     <!-- 搜索区域 -->
-    <div class="mb-6 p-4">
-      <div class="flex flex-wrap items-center gap-x-6 gap-y-4">
-        <!-- 标签名称输入框 -->
-        <div class="flex items-center gap-2">
-          <label class="w-24 text-base text-gray-700 text-right"
-            >标签名称：</label
-          >
-          <input
-            type="text"
-            v-model="searchQuery"
-            placeholder="输入标签名称"
-            class="w-[180px] px-3 py-2 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-            @keyup.enter="handleSearch"
-          />
-        </div>
-
-        <!-- 分类筛选下拉框 -->
-        <div class="flex items-center gap-2">
-          <label class="w-24 text-base text-gray-700 text-right"
-            >分类筛选：</label
-          >
-          <div class="relative w-[180px]">
-            <select
-              v-model="selectedCategory"
-              class="block appearance-none w-full px-3 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">所有分类</option>
-              <option value="category1">分类1</option>
-              <option value="category2">分类2</option>
-            </select>
-            <!-- 自定义下拉箭头 -->
-            <div
-              class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-gray-500"
-            >
-              <svg class="h-4 w-4 fill-current" viewBox="0 0 20 20">
-                <path d="M5.5 7l4.5 4.5 4.5-4.5z"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-
+    <div class="py-4">
+      <div class="flex flex-wrap items-center gap-4">
+        <SearchInput
+          label="名称"
+          v-model="searchQuery.name"
+          placeholder="请输入标签名称"
+          width="220px"
+        />
+        <SearchInput
+          label="状态"
+          v-model="searchQuery.status"
+          placeholder="请输入状态"
+          width="220px"
+        />
+        <SearchInput
+          label="颜色"
+          v-model="searchQuery.color"
+          placeholder="请选择颜色"
+          width="220px"
+        />
         <!-- 搜索按钮 -->
-        <div class="flex items-center gap-2">
-          <button
-            class="w-[180px] px-3 py-2 text-base bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-            @click="handleSearch"
-          >
-            搜索
-          </button>
-        </div>
+        <button
+          class="px-4 py-2 bg-[#A855F7] text-white rounded-lg shadow-sm hover:bg-[#9333EA]"
+          @click="search"
+        >
+          搜索
+        </button>
+        <button
+          class="px-4 py-2 bg-gray-400 text-white rounded-lg shadow-sm hover:bg-gray-500"
+          @click="reset"
+        >
+          重置
+        </button>
       </div>
+    </div>
+    <!-- 按钮组 -->
+    <div class="flex items-center gap-3">
+      <!-- 新增按钮（绿色） -->
+      <button
+        class="px-4 py-1.5 bg-green-500 text-white rounded-lg shadow-sm hover:bg-green-600"
+        @click="add"
+      >
+        新增
+      </button>
+
+      <!-- 修改按钮（蓝色） -->
+      <button
+        class="px-4 py-1.5 bg-blue-500 text-white rounded-lg shadow-sm hover:bg-blue-600"
+        @click="edit"
+      >
+        修改
+      </button>
+
+      <!-- 删除按钮（红色） -->
+      <button
+        class="px-4 py-1.5 bg-red-500 text-white rounded-lg shadow-sm hover:bg-red-600"
+        @click="deleteItem"
+      >
+        删除
+      </button>
+
+      <!-- 批量删除按钮（深红色） -->
+      <button
+        class="px-4 py-1.5 bg-red-700 text-white rounded-lg shadow-sm hover:bg-red-800"
+        @click="batchDelete"
+      >
+        批量删除
+      </button>
     </div>
 
     <!-- 标签列表 -->
-    <div class="overflow-x-auto">
-      <table class="min-w-full">
-        <thead>
-          <tr class="bg-gray-50">
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              标签名称
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              颜色
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              使用次数
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              操作
-            </th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="tag in tags" :key="tag.id" class="hover:bg-gray-50">
-            <td class="px-6 py-4 whitespace-nowrap">
-              {{ tag.name }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span
-                class="inline-block w-6 h-6 rounded mr-2"
-                :style="{ backgroundColor: tag.color }"
-              ></span>
-              {{ tag.color }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              {{ tag.count }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="flex gap-2">
-                <button
-                  class="text-blue-600 hover:text-blue-800"
-                  @click="handleEdit(tag)"
-                >
-                  编辑
-                </button>
-                <button
-                  class="text-red-600 hover:text-red-800"
-                  @click="handleDelete(tag.id)"
-                >
-                  删除
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <CommonTable :columns="columns" :data="tags" @row-click="handleRowClick">
+      <!-- 颜色列自定义渲染 -->
+      <template #color="{ row }">
+        <span
+          class="inline-block w-6 h-6 rounded mr-2"
+          :style="{ backgroundColor: row.color }"
+        ></span>
+        {{ row.color }}
+      </template>
+      <!-- 操作列自定义渲染 -->
+      <template #actions="{ row }">
+        <div class="flex gap-2">
+          <button
+            class="text-blue-600 hover:text-blue-800"
+            @click.stop="handleEdit(row)"
+          >
+            编辑
+          </button>
+          <button
+            class="text-red-600 hover:text-red-800"
+            @click.stop="handleDelete(row.id)"
+          >
+            删除
+          </button>
+        </div>
+      </template>
+    </CommonTable>
 
     <!-- 分页 -->
     <div class="flex justify-between items-center mt-6">
@@ -200,9 +183,30 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { tagApi } from "../../../api/tagManagement";
+import SearchInput from "../../../components/common/SearchInput.vue";
+import CommonTable from "../../../components/common/CommonTable.vue";
+
+// 表格列配置
+const columns = [
+  { key: "name", title: "标签名称" },
+  { key: "color", title: "颜色" },
+  { key: "count", title: "使用次数" },
+  { key: "actions", title: "操作" },
+];
+
+// 行点击处理
+const handleRowClick = (row) => {
+  console.log("行点击:", row);
+};
+
+// 修改搜索状态对象
+const searchQuery = ref({
+  name: "",
+  status: "",
+  color: "",
+});
 
 // 状态
-const searchQuery = ref("");
 const tags = ref([]);
 const currentPage = ref(1);
 const totalPages = ref(1);
@@ -213,6 +217,40 @@ const formData = ref({
   name: "",
   color: "#1890ff",
 });
+
+// 模拟数据
+const mockTags = [
+  {
+    id: 1,
+    name: "JavaScript",
+    color: "#F7DF1E",
+    count: 125,
+  },
+  {
+    id: 2,
+    name: "Vue.js",
+    color: "#4FC08D",
+    count: 89,
+  },
+  {
+    id: 3,
+    name: "React",
+    color: "#61DAFB",
+    count: 76,
+  },
+  {
+    id: 4,
+    name: "TypeScript",
+    color: "#3178C6",
+    count: 92,
+  },
+  {
+    id: 5,
+    name: "Node.js",
+    color: "#339933",
+    count: 67,
+  },
+];
 
 // 方法定义
 const handleSearch = () => {
@@ -264,13 +302,13 @@ const handleSubmit = async () => {
 
 const loadData = async () => {
   try {
-    const res = await tagApi.getList({
-      page: currentPage.value,
-      query: searchQuery.value,
-    });
-    tags.value = res.data.list;
-    total.value = res.data.total;
-    totalPages.value = res.data.totalPages;
+    // 模拟 API 调用延迟
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // 使用模拟数据
+    tags.value = mockTags;
+    total.value = mockTags.length;
+    totalPages.value = 1;
   } catch (error) {
     console.error("加载失败:", error);
   }

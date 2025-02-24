@@ -104,9 +104,9 @@
 </template>
 
 <script setup>
-import SqlContent from "../../components/SqlContent.vue";
-import SqlEditor from "../../components/SqlEditor.vue";
-import TopBar from "../../components/TopBar.vue";
+import SqlContent from "../../../components/SqlContent.vue";
+import SqlEditor from "../../../components/SqlEditor.vue";
+import TopBar from "../../../components/TopBar.vue";
 import { ref, computed, nextTick, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
@@ -118,12 +118,12 @@ import {
   CommentOutlined,
 } from "@ant-design/icons-vue";
 import { Spin } from "ant-design-vue";
-import SplitPane from "../../components/SplitPane.vue";
-import SqlResultPanel from "../../components/SqlResultPanel.vue";
-import ProblemDescription from "../../components/problem/ProblemDescription.vue";
-import SubmissionHistory from "../../components/problem/SubmissionHistory.vue";
-import TestCasePanel from "../../components/problem/TestCasePanel.vue";
-import TestResultPanel from "../../components/problem/TestResultPanel.vue";
+import SplitPane from "../../../components/SplitPane.vue";
+import SqlResultPanel from "../../../components/SqlResultPanel.vue";
+import ProblemDescription from "../../../components/problem/ProblemDescription.vue";
+import SubmissionHistory from "../../../components/problem/SubmissionHistory.vue";
+import TestCasePanel from "../../../components/problem/TestCasePanel.vue";
+import TestResultPanel from "../../../components/problem/TestResultPanel.vue";
 
 const loading = ref(false);
 const route = useRoute();

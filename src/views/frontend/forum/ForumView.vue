@@ -199,10 +199,10 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick, watch, onUnmounted } from "vue";
-import { tags } from "../../api/tags";
-import { blog } from "../../api/blog";
-import LoginCard from "../../components/forum/NowLoginCard.vue";
-import PostCard from "../../components/forum/PostCard.vue";
+import { tags } from "../../../api/tags.js";
+import { blog } from "../../../api/blog.js";
+import LoginCard from "../../../components/forum/NowLoginCard.vue";
+import PostCard from "../../../components/forum/PostCard.vue";
 import {
   FileText,
   Users,
@@ -214,10 +214,10 @@ import {
   ChevronDown,
   X,
 } from "lucide-vue-next";
-import TopicListButton from "../../components/topics/TopicListButton.vue";
-import FilterTags from "../../components/forum/TagList.vue";
-import MustReadList from "../../components/forum/MustReadList.vue";
-import PostModal from "../../components/forum/PostModal.vue";
+import TopicListButton from "../../../components/topics/TopicListButton.vue";
+import FilterTags from "../../../components/forum/TagList.vue";
+import MustReadList from "../../../components/forum/MustReadList.vue";
+import PostModal from "../../../components/forum/PostModal.vue";
 import { message } from "ant-design-vue"; // 引入消息提示组件
 import { useRouter, useRoute } from "vue-router";
 import { Pagination as APagination } from "ant-design-vue";

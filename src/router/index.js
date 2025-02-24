@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import PersonalCenter from '../views/user/PersonalCenter.vue'
+import PersonalCenter from '../views/frontend/user/PersonalCenter.vue'
 import { useAuthStore } from '../stores/auth'
 import { message } from 'ant-design-vue'
 
@@ -15,19 +15,19 @@ const routes = [
       {
         path: 'home',
         name: 'home',
-        component: () => import('../views/home/HomeView.vue'),
+        component: () => import('../views/frontend/home/HomeView.vue'),
         meta: { menu: '/home' }
       },
       {
         path: 'topics',
         name: 'topics',
-        component: () => import('../views/topics/TopicsView.vue'),
+        component: () => import('../views/frontend/topics/TopicsView.vue'),
         meta: { menu: '/topics' }
       },
       {
         path: 'forum/:category?',
         name: 'Forum',
-        component: () => import('../views/forum/ForumView.vue'),
+        component: () => import('../views/frontend/forum/ForumView.vue'),
         props: (route) => ({
           selectedCategory: Number(route.params.category) || 1
         }),
@@ -35,19 +35,19 @@ const routes = [
       {
         path: 'about',
         name: 'about',
-        component: () => import('../views/other/AboutView.vue'),
+        component: () => import('../views/frontend/other/AboutView.vue'),
         meta: { menu: '/about' }
       },
       {
         path: 'forum/post/:id',
         name: 'PostDetail',
-        component: () => import('../views/forum/PostDetailView.vue'),
+        component: () => import('../views/frontend/forum/PostDetailView.vue'),
         props: true
       },
       {
         path: 'notifications',
         name: 'notifications',
-        component: () => import('../views/notice/NotificationsView.vue'),
+        component: () => import('../views/frontend/notice/NotificationsView.vue'),
         meta: { 
           requiresAuth: true,
           title: '消息通知'
@@ -64,7 +64,7 @@ const routes = [
       {
         path: 'problem/:id',
         name: 'SqlProblemDetail',
-        component: () => import('../views/problem/SqlProblemDetail.vue'),
+        component: () => import('../views/frontend/problem/SqlProblemDetail.vue'),
         meta: {
           hideNavAndFooter: true
         }
@@ -72,7 +72,7 @@ const routes = [
       {
         path: 'bank/detail/:id',
         name: 'BankDetail',
-        component: () => import('../views/bank/BankDetailView.vue')
+        component: () => import('../views/frontend/bank/BankDetailView.vue')
       },
       {
         path: ':pathMatch(.*)*',
