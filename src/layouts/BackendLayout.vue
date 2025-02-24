@@ -223,7 +223,6 @@ watch(
 
 .content-wrapper {
   background: #fff;
-  padding: 24px;
   border-radius: 2px;
 }
 
