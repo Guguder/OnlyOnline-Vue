@@ -1,4 +1,4 @@
-import request from '../utils/request'
+import request from '../../utils/request.js'
 
 export const blog = {
     // 发布博客

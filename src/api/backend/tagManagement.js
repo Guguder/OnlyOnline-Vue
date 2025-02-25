@@ -1,10 +1,10 @@
-import request from '../utils/request'
+import request from '../../utils/request.js'
 
 export const tagApi = {
   // 获取标签列表
   getList(params) {
     return request({
-      url: '/api/tags',
+      url: '/tags/list',
       method: 'get',
       params
     })
@@ -13,7 +13,7 @@ export const tagApi = {
   // 创建标签
   create(data) {
     return request({
-      url: '/api/tags',
+      url: '/tags/create',
       method: 'post',
       data
     })
@@ -22,7 +22,7 @@ export const tagApi = {
   // 更新标签
   update(id, data) {
     return request({
-      url: `/api/tags/${id}`,
+      url: `/tags/update/${id}`,
       method: 'put',
       data
     })
@@ -31,7 +31,7 @@ export const tagApi = {
   // 删除标签
   delete(id) {
     return request({
-      url: `/api/tags/${id}`,
+      url: `/tags/delete/${id}`,
       method: 'delete'
     })
   },
@@ -39,9 +39,17 @@ export const tagApi = {
   // 批量删除标签
   batchDelete(ids) {
     return request({
-      url: '/api/tags/batch',
+      url: '/tags/batch-delete',
       method: 'delete',
-      data: { ids }
+      data: {ids}
     })
+  },
+
+  // 添加获取标签详情的方法
+  getInfo: (id) => {
+    return request({
+      url: `/tags/info/${id}`,
+      method: 'get'
+    });
   }
 }

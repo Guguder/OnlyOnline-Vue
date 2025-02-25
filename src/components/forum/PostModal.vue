@@ -168,8 +168,8 @@ import {
   Share2,
   PenLine,
 } from "lucide-vue-next";
-import { blog } from "../../api/blog";
-import { tags } from "../../api/tags";
+import { blog } from "../../api/frontend/blog.js";
+import { tags } from "../../api/frontend/tags.js";
 import { Checkbox as ACheckbox } from "ant-design-vue"; // 确保引入了 Checkbox
 
 const props = defineProps({

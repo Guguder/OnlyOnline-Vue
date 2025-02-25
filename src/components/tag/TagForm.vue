@@ -37,7 +37,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { tagApi } from "../../api/tagManagement";
+import { tagApi } from "../../api/backend/tagManagement.js";
 
 const props = defineProps({
   tag: {

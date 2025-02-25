@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white mt-4 flex flex-col flex-grow">
+  <div class="bg-white flex flex-col flex-grow">
     <div class="flex-1 overflow-auto min-h-0">
       <table class="w-full">
         <thead class="bg-gray-50">
@@ -26,7 +26,7 @@
           <tr
             v-for="(item, index) in data"
             :key="item.id"
-            :class="[ 
+            :class="[
               index % 2 === 0 ? 'bg-white h-12' : 'bg-[#F7F8FA] h-12',
               'hover:bg-gray-50 cursor-pointer',
             ]"
@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed } from "vue";
 
 const props = defineProps({
   columns: {
@@ -70,8 +70,8 @@ const props = defineProps({
   },
   selectable: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
 const emit = defineEmits(["row-click", "selection-change"]);
@@ -79,17 +79,22 @@ const emit = defineEmits(["row-click", "selection-change"]);
 const selectedRows = ref([]);
 
 const isAllSelected = computed(() => {
-  return props.data.length > 0 && selectedRows.value.length === props.data.length;
+  return (
+    props.data.length > 0 && selectedRows.value.length === props.data.length
+  );
 });
 
 const isIndeterminate = computed(() => {
-  return selectedRows.value.length > 0 && selectedRows.value.length < props.data.length;
+  return (
+    selectedRows.value.length > 0 &&
+    selectedRows.value.length < props.data.length
+  );
 });
 
 const toggleSelectAll = (e) => {
   const checked = e.target.checked;
-  selectedRows.value = checked ? props.data.map(item => item.id) : [];
-  emit('selection-change', selectedRows.value);
+  selectedRows.value = checked ? props.data.map((item) => item.id) : [];
+  emit("selection-change", selectedRows.value);
 };
 
 const toggleSelect = (row) => {
@@ -99,7 +104,7 @@ const toggleSelect = (row) => {
   } else {
     selectedRows.value.splice(index, 1);
   }
-  emit('selection-change', selectedRows.value);
+  emit("selection-change", selectedRows.value);
 };
 
 const handleRowClick = (row) => {

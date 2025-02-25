@@ -280,7 +280,7 @@ import {
 import {formatNumber} from "../../../utils/format.js";
 import CommentList from "../../../components/comment/CommentList.vue";
 import {withAuth} from "../../../utils/authGuard.js";
-import {blog} from "../../../api/blog.js";
+import {blog} from "../../../api/frontend/blog.js";
 import Vditor from "vditor";
 import "vditor/dist/index.css";
 import {message} from "ant-design-vue";

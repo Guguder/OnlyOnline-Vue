@@ -7,13 +7,15 @@
       class="flex items-center px-3 py-1.5 border border-gray-300 rounded-lg bg-white shadow-sm"
       :style="{ width: width }"
     >
-      <input
-        type="text"
-        class="border-none outline-none bg-transparent text-gray-800 text-sm w-full"
-        :placeholder="placeholder"
-        :value="modelValue"
-        @input="$emit('update:modelValue', $event.target.value)"
-      />
+      <slot name="input">
+        <input
+          type="text"
+          class="border-none outline-none bg-transparent text-gray-800 text-sm w-full"
+          :placeholder="placeholder"
+          :value="modelValue"
+          @input="$emit('update:modelValue', $event.target.value)"
+        />
+      </slot>
     </div>
   </div>
 </template>

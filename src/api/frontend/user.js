@@ -1,4 +1,4 @@
-import request from '../utils/request'
+import request from '../../utils/request.js'
 
 export const user = {
     // 更新用户信息

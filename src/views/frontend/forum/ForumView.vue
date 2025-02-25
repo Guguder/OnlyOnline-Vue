@@ -199,8 +199,8 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick, watch, onUnmounted } from "vue";
-import { tags } from "../../../api/tags.js";
-import { blog } from "../../../api/blog.js";
+import { tags } from "../../../api/frontend/tags.js";
+import { blog } from "../../../api/frontend/blog.js";
 import LoginCard from "../../../components/forum/NowLoginCard.vue";
 import PostCard from "../../../components/forum/PostCard.vue";
 import {

@@ -48,7 +48,7 @@
 </template>
 
 <script setup>
-import { getBankDetail } from '../../../api/bank.js';
+import { getBankDetail } from '../../../api/frontend/bank.js';
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 

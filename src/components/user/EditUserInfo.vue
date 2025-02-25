@@ -172,7 +172,7 @@
 import { ref, onMounted } from "vue";
 import zhCN from "ant-design-vue/es/date-picker/locale/zh_CN";
 import dayjs from "dayjs"; // 需要引入 dayjs 处理日期
-import { user } from "../../api/user.js";
+import { user } from "../../api/frontend/user.js";
 import { message } from "ant-design-vue";
 import { cityOptions } from "../../constants/cityData.js"; // 导入城市数据
 

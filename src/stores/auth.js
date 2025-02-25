@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { auth } from '../api/auth'
+import { auth } from '../api/frontend/auth.js'
 import { message } from 'ant-design-vue'
 
 export const useAuthStore = defineStore('auth', () => {

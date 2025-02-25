@@ -160,7 +160,7 @@ import RankingList from "../../../components/forum/RankingList.vue";
 import ProblemList from "../../../components/topics/TopicList.vue";
 import { Search, Shuffle, CheckCircle2, Circle, Lock } from "lucide-vue-next";
 import { ref, onMounted } from "vue";
-import { getBankList } from '../../../api/bank.js';
+import { getBankList } from '../../../api/frontend/bank.js';
 
 const problems = ref([
   {

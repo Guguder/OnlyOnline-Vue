@@ -106,7 +106,7 @@
         </div>
       </a-layout-header>
       <a-layout-content class="content">
-        <div class="content-wrapper">
+        <div class="content-wrapper h-full">
           <router-view></router-view>
         </div>
       </a-layout-content>
@@ -219,11 +219,15 @@ watch(
   padding: 0;
   background: transparent;
   min-height: 280px;
+  height: calc(100vh - 80px); /* 减去头部高度和间距 */
+  overflow: hidden;
 }
 
 .content-wrapper {
   background: #fff;
   border-radius: 2px;
+  height: 100%;
+  overflow: hidden;
 }
 
 .menu-item-content {
