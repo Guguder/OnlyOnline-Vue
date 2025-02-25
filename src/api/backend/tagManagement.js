@@ -1,4 +1,4 @@
-import request from '../../utils/request.js'
+import request from '@/utils/request'
 
 export const tagApi = {
   // 获取标签列表
@@ -13,16 +13,16 @@ export const tagApi = {
   // 创建标签
   create(data) {
     return request({
-      url: '/tags/create',
+      url: '/tags/',
       method: 'post',
       data
     })
   },
 
   // 更新标签
-  update(id, data) {
+  update(data) {
     return request({
-      url: `/tags/update/${id}`,
+      url: '/tags/',
       method: 'put',
       data
     })

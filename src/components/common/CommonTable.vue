@@ -2,9 +2,22 @@
   <div class="bg-white flex flex-col flex-grow">
     <div class="flex-1 overflow-auto min-h-0">
       <table class="w-full">
+        <colgroup>
+          <col v-if="selectable" style="width: 16px" />
+          <col
+            v-for="(column, index) in columns"
+            :key="column.key"
+            :style="{
+              width:
+                index === columns.length - 1 && column.action
+                  ? '100px'
+                  : column.width || 'auto',
+            }"
+          />
+        </colgroup>
         <thead class="bg-gray-50">
           <tr class="h-12">
-            <th v-if="selectable" class="w-[50px] px-4">
+            <th v-if="selectable" class="px-1 w-6 text-center">
               <input
                 type="checkbox"
                 class="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
@@ -16,7 +29,7 @@
             <th
               v-for="column in columns"
               :key="column.key"
-              class="px-4 text-left text-sm font-bold text-black uppercase tracking-wider"
+              class="px-4 text-left text-sm font-bold text-black uppercase tracking-wider truncate"
             >
               {{ column.title }}
             </th>
@@ -32,7 +45,7 @@
             ]"
             @click="handleRowClick(item)"
           >
-            <td v-if="selectable" class="px-6" @click.stop>
+            <td v-if="selectable" class="px-1 w-6 text-center" @click.stop>
               <input
                 type="checkbox"
                 class="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
@@ -43,7 +56,7 @@
             <td
               v-for="column in columns"
               :key="column.key"
-              class="px-4 whitespace-nowrap"
+              class="px-4 truncate"
             >
               <slot :name="column.key" :row="item">
                 {{ item[column.key] }}
@@ -116,5 +129,19 @@ const handleRowClick = (row) => {
 table {
   border-collapse: separate;
   border-spacing: 0;
+}
+
+th,
+td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

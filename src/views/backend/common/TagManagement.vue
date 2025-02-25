@@ -84,8 +84,9 @@
 
           <!-- 批量删除按钮（深红色） -->
           <button
-            class="px-4 py-1.5 bg-red-700 text-white rounded-lg shadow-sm hover:bg-red-800"
+            class="px-4 py-1.5 bg-red-700 text-white rounded-lg shadow-sm hover:bg-red-800 disabled:bg-gray-400 disabled:cursor-not-allowed"
             @click="batchDelete"
+            :disabled="!selectedRows.length"
           >
             批量删除
           </button>
@@ -101,6 +102,12 @@
           @row-click="handleRowClick"
           @selection-change="handleSelectionChange"
         >
+          <!-- 修改列模板，添加固定宽度和省略样式 -->
+          <template #name="{ row }">
+            <div class="fixed-width-cell" :title="row.name">
+              {{ row.name }}
+            </div>
+          </template>
           <!-- 颜色列自定义渲染 -->
           <template #color="{ row }">
             <div class="flex items-center">
@@ -215,12 +222,11 @@ import {
 } from "ant-design-vue";
 import BaseModal from "../../../components/common/BaseModal.vue";
 
-// 修改表格列配置，交换顺序并调整宽度
 const columns = [
-  { key: "name", title: "标签名称", width: "30%" },
-  { key: "color", title: "标签颜色", width: "30%" },
-  { key: "status", title: "状态", width: "20%" },
-  { key: "actions", title: "操作", width: "20%" },
+  { key: "name", title: "标签名称", width: "200px" },
+  { key: "color", title: "标签颜色", width: "160px" },
+  { key: "status", title: "状态", width: "120px" },
+  { key: "actions", title: "操作", width: "120px" },
 ];
 
 // 行点击处理
@@ -284,10 +290,16 @@ const closeModal = () => {
   formData.value = { name: "", status: "1", color: "#843e87" }; // 修改默认颜色
 };
 
+// 修改直接编辑按钮的处理方法
 const handleEdit = (tag) => {
   isEdit.value = true;
-  formData.value = { ...tag };
+  // 确保status是字符串类型
+  formData.value = {
+    ...tag,
+    status: String(tag.status), // 强制转换为字符串
+  };
   showModal.value = true;
+  console.log("编辑数据:", formData.value); // 添加日志便于调试
 };
 
 const handleDelete = async (id) => {
@@ -303,17 +315,39 @@ const handleDelete = async (id) => {
 
 const handleSubmit = async () => {
   try {
-    if (isEdit.value) {
-      await tagApi.update(formData.value.id, formData.value);
-    } else {
-      await tagApi.create(formData.value);
+    // 验证表单数据
+    if (!formData.value.name) {
+      message.warning("请输入标签名称");
+      return;
     }
+    if (!formData.value.color) {
+      message.warning("请选择标签颜色");
+      return;
+    }
+
+    // 构造请求数据
+    const submitData = {
+      name: formData.value.name,
+      color: formData.value.color,
+      status: parseInt(formData.value.status), // 确保status是数字类型
+    };
+
+    if (isEdit.value) {
+      // 修改操作需要id
+      submitData.id = formData.value.id;
+      await tagApi.update(submitData);
+      message.success("修改成功");
+    } else {
+      // 新增操作
+      await tagApi.create(submitData);
+      message.success("新增成功");
+    }
+
     showModal.value = false;
-    await loadData();
-    // 可以添加成功提示
+    await loadData(); // 刷新列表
   } catch (error) {
     console.error("操作失败:", error);
-    // 可以添加错误提示
+    message.error(error.message || "操作失败");
   }
 };
 
@@ -364,28 +398,29 @@ const reset = () => {
   loadData();
 };
 
-// 添加批量删除方法
+// 修改批量删除方法
 const batchDelete = async () => {
   if (selectedRows.value.length === 0) {
-    // 可以添加提示：请选择要删除的项
+    message.warning("请选择要删除的数据");
     return;
   }
 
   try {
     const ids = selectedRows.value.map((row) => row.id);
     await tagApi.batchDelete(ids);
+    message.success("删除成功");
     await loadData();
-    // 可以添加成功提示
+    // 清空选中状态
+    selectedRows.value = [];
   } catch (error) {
     console.error("批量删除失败:", error);
-    // 可以添加错误提示
+    message.error("删除失败");
   }
 };
 
-// 修改按钮点击处理
-const edit = () => {
+// 修改表格选择编辑按钮的处理方法
+const edit = async () => {
   if (selectedRows.value.length === 0) {
-    // 使用 ant-design-vue 的消息提示
     message.warning("请选择要修改的数据");
     return;
   }
@@ -395,19 +430,31 @@ const edit = () => {
     return;
   }
 
-  // 获取选中的数据
-  const selectedRow = selectedRows.value[0];
-  // 设置为编辑模式
-  isEdit.value = true;
-  // 数据回显
-  formData.value = {
-    id: selectedRow.id,
-    name: selectedRow.name,
-    status: selectedRow.status.toString(), // 转换为字符串
-    color: selectedRow.color,
-  };
-  // 打开模态框
-  showModal.value = true;
+  try {
+    // 获取选中的数据
+    const selectedRow = selectedRows.value[0];
+    // 调用获取详情接口
+    const response = await tagApi.getInfo(selectedRow.id);
+
+    if (response.data.code === 200) {
+      // 设置为编辑模式
+      isEdit.value = true;
+      // 数据回显
+      formData.value = {
+        id: response.data.data.id,
+        name: response.data.data.name,
+        status: String(response.data.data.status), // 强制转换为字符串
+        color: response.data.data.color,
+      };
+      // 打开模态框
+      showModal.value = true;
+    } else {
+      message.error(response.data.msg || "获取标签信息失败");
+    }
+  } catch (error) {
+    console.error("获取标签信息失败:", error);
+    message.error("获取标签信息失败");
+  }
 };
 
 onMounted(() => {
@@ -443,81 +490,6 @@ onMounted(() => {
   height: 100%;
   padding: 1px; /* 防止边界问题 */
 }
-
-:deep(.ant-table-wrapper) {
-  height: 100%;
-}
-
-:deep(.ant-table) {
-  height: 100%;
-}
-
-/* 模态框内容样式 */
-:deep(.ant-modal-content) {
-  padding: 24px;
-}
-
-:deep(.ant-modal-header) {
-  padding: 0 0 16px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-:deep(.ant-modal-footer) {
-  margin-top: 24px;
-  padding: 16px 0 0 0;
-  border-top: 1px solid #f0f0f0;
-}
-
-/* 模态框动画样式 */
-:deep(.custom-modal .ant-modal) {
-  top: 50%;
-  padding-bottom: 0;
-  transform-origin: center;
-}
-
-:deep(.zoom-enter-active),
-:deep(.zoom-leave-active) {
-  transition: all 0.2s ease;
-}
-
-:deep(.zoom-enter-from),
-:deep(.zoom-leave-to) {
-  opacity: 0;
-  transform: scale(0.5);
-}
-
-:deep(.zoom-enter-to),
-:deep(.zoom-leave-from) {
-  opacity: 1;
-  transform: scale(1);
-}
-
-/* 遮罩层动画 */
-:deep(.fade-enter-active),
-:deep(.fade-leave-active) {
-  transition: opacity 0.2s ease;
-}
-
-:deep(.fade-enter-from),
-:deep(.fade-leave-to) {
-  opacity: 0;
-}
-
-:deep(.fade-enter-to),
-:deep(.fade-leave-from) {
-  opacity: 1;
-}
-
-/* 重写模态框动画和样式 */
-:deep(.tag-modal .ant-modal) {
-  transform-origin: center !important;
-  animation: zoomIn 0.2s ease-out !important;
-}
-
-:deep(.tag-modal .ant-modal-mask) {
-  animation: fadeIn 0.2s ease-out !important;
-}
-
 @keyframes zoomIn {
   from {
     opacity: 0;
@@ -553,71 +525,15 @@ onMounted(() => {
     transform: scale(0.3);
   }
 }
-/* 调整表单项样式 */
-:deep(.ant-form-item) {
-  margin-bottom: 12px;
-}
-
-:deep(.ant-form-item-label) {
-  padding-bottom: 4px;
-}
-
-:deep(
-    .ant-form-item-required:not(.ant-form-item-required-mark-optional)
-  )::before {
-  display: none;
-}
-
-:deep(
-    .ant-form-item-label
-      > label.ant-form-item-required:not(
-        .ant-form-item-required-mark-optional
-      )::after
-  ) {
-  content: "*";
-  color: #ff4d4f;
-  margin-left: 4px;
-}
 
 /* 调整表单标签样式 */
 :deep(.ant-form-item-label > label) {
   font-weight: 500; /* 设置标签文字加粗 */
 }
 
-/* 调整表单项布局样式 */
-:deep(.ant-form-inline .ant-form-item-label) {
-  min-width: 80px;
-  text-align: right;
-  padding-right: 8px;
-}
-
-:deep(.ant-form-inline .ant-form-item) {
-  display: flex;
-  margin-bottom: 16px;
-  width: 100%;
-}
-
-:deep(.ant-form-inline .ant-form-item-control) {
-  width: 220px;
-}
-
 /* 保持标签加粗 */
 :deep(.ant-form-item-label > label) {
   font-weight: 500;
-}
-
-/* 调整表单布局样式 */
-:deep(.ant-form-item) {
-  margin-bottom: 16px;
-  display: flex !重要;
-  flex-direction: row !重要;
-}
-
-:deep(.ant-form-item-label) {
-  padding-right: 12px;
-  line-height: 32px;
-  flex-shrink: 0;
-  white-space: nowrap;
 }
 
 :deep(.ant-form-item-label > label) {
@@ -626,16 +542,17 @@ onMounted(() => {
   margin-bottom: 0;
 }
 
-:deep(.ant-form-item-control) {
-  flex: none !重要;
-  width: auto !重要;
+.fixed-width-cell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
 }
 
-/* 移除之前的 inline form 相关样式 */
-/* 删除之前的表单布局相关样式... */
-
-/* 添加新的样式 */
-:deep(.ant-table-cell) {
-  vertical-align: middle !important;
+:deep(.ant-table-thead > tr > th) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
