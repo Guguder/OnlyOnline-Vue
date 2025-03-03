@@ -28,20 +28,20 @@ export const tagApi = {
     })
   },
 
-  // 删除标签
+  // 删除单个标签
   delete(id) {
     return request({
-      url: `/tags/delete/${id}`,
+      url: `/tags/remove/${id}`,
       method: 'delete'
     })
   },
 
-  // 批量删除标签
+  // 批量删除标签 - 直接发送数组
   batchDelete(ids) {
     return request({
-      url: '/tags/batch-delete',
+      url: '/tags/remove/batch',
       method: 'delete',
-      data: {ids}
+      data: ids
     })
   },
 

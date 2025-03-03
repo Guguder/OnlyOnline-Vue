@@ -8,51 +8,33 @@
           <span class="text-xl font-bold text-gray-800">标签管理</span>
         </div>
 
-        <!-- 搜索区域 -->
+        <!-- 搜索区域 - 使用 Ant Design Form -->
         <div class="px-5 pt-6">
-          <div class="flex flex-wrap items-center gap-4">
-            <SearchInput label="名称" width="220px" labelClass="font-medium">
-              <template #input>
-                <a-input
-                  v-model:value="searchQuery.name"
-                  placeholder="请输入标签名称"
-                  :style="{ width: '220px' }"
-                />
-              </template>
-            </SearchInput>
-            <SearchInput label="状态" width="220px">
-              <template #input>
-                <a-select
-                  v-model:value="searchQuery.status"
-                  placeholder="请选择状态"
-                  :options="statusOptions"
-                  :style="{ width: '220px' }"
-                />
-              </template>
-            </SearchInput>
-            <SearchInput label="颜色" width="220px">
-              <template #input>
-                <a-input
-                  v-model:value="searchQuery.color"
-                  placeholder="请选择颜色"
-                  :style="{ width: '220px' }"
-                />
-              </template>
-            </SearchInput>
-            <!-- 搜索按钮 -->
-            <button
-              class="px-4 py-1.5 bg-[#A855F7] text-white rounded-lg shadow-sm hover:bg-[#9333EA]"
-              @click="search"
-            >
-              搜索
-            </button>
-            <button
-              class="px-4 py-1.5 bg-gray-400 text-white rounded-lg shadow-sm hover:bg-gray-500"
-              @click="reset"
-            >
-              重置
-            </button>
-          </div>
+          <a-form layout="inline" :model="searchQuery">
+            <a-form-item label="标签名称">
+              <a-input
+                v-model:value="searchQuery.name"
+                placeholder="请输入标签名称"
+                allow-clear
+                :style="{ width: '220px' }"
+              />
+            </a-form-item>
+            <a-form-item label="状态">
+              <a-select
+                v-model:value="searchQuery.status"
+                placeholder="请选择状态"
+                :options="statusOptions"
+                allow-clear
+                :style="{ width: '220px' }"
+              />
+            </a-form-item>
+            <a-form-item>
+              <a-space>
+                <a-button type="primary" @click="search">搜索</a-button>
+                <a-button @click="reset">重置</a-button>
+              </a-space>
+            </a-form-item>
+          </a-form>
         </div>
 
         <!-- 按钮组 -->
@@ -69,22 +51,14 @@
           <button
             class="px-5 py-1.5 bg-blue-500 text-white rounded-lg shadow-sm hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
             @click="edit"
-            :disabled="!selectedRows.length"
+            :disabled="!selectedRows.length || selectedRows.length > 1"
           >
             修改
           </button>
 
-          <!-- 删除按钮（红色） -->
-          <button
-            class="px-5 py-1.5 bg-red-500 text-white rounded-lg shadow-sm hover:bg-red-600"
-            @click="deleteItem"
-          >
-            删除
-          </button>
-
           <!-- 批量删除按钮（深红色） -->
           <button
-            class="px-4 py-1.5 bg-red-700 text-white rounded-lg shadow-sm hover:bg-red-800 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            class="px-4 py-1.5 bg-red-700 text-white rounded-lg shadow-sm hover:bg-red-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
             @click="batchDelete"
             :disabled="!selectedRows.length"
           >
@@ -95,7 +69,15 @@
 
       <!-- 可滚动的列表区域 -->
       <div class="flex-1 min-h-0 px-5 overflow-y-auto custom-scrollbar">
+        <a-skeleton :loading="loading" active :paragraph="{ rows: 7 }" v-if="loading">
+          <template #title>
+            <a-space direction="vertical" style="width: 100%">
+              <a-skeleton-button :active="true" size="large" block />
+            </a-space>
+          </template>
+        </a-skeleton>
         <CommonTable
+          v-else
           :columns="columns"
           :data="tags"
           :selectable="true"
@@ -210,7 +192,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { tagApi } from "@/api/backend/tagManagement.js";
-import SearchInput from "../../../components/common/SearchInput.vue";
 import CommonTable from "../../../components/common/CommonTable.vue";
 import {
   Pagination as APagination,
@@ -218,7 +199,12 @@ import {
   Select as ASelect,
   Form as AForm,
   FormItem as AFormItem,
+  Space as ASpace,
+  Button as AButton,
   message,
+  Modal as AModal,
+  Skeleton as ASkeleton,
+  SkeletonButton as ASkeletonButton,
 } from "ant-design-vue";
 import BaseModal from "../../../components/common/BaseModal.vue";
 
@@ -237,8 +223,7 @@ const handleRowClick = (row) => {
 // 修改搜索状态对象
 const searchQuery = ref({
   name: "",
-  status: "",
-  color: "",
+  status: undefined,
 });
 
 // 状态
@@ -255,12 +240,14 @@ const formData = ref({
 });
 const pageSize = ref(7);
 
-// 添加状态选项数据
+// 修改状态选项数据
 const statusOptions = [
-  { label: "全部", value: "" },
   { label: "启用", value: "1" },
   { label: "停用", value: "0" },
 ];
+
+// 添加加载状态
+const loading = ref(false);
 
 // 方法定义
 const handleSearch = () => {
@@ -302,15 +289,24 @@ const handleEdit = (tag) => {
   console.log("编辑数据:", formData.value); // 添加日志便于调试
 };
 
+// 修改单个删除方法
 const handleDelete = async (id) => {
-  try {
-    await tagApi.delete(id);
-    await loadData();
-    // 可以添加成功提示
-  } catch (error) {
-    console.error("删除失败:", error);
-    // 可以添加错误提示
-  }
+  AModal.confirm({
+    title: '确认删除',
+    content: '确定要删除这条数据吗？',
+    okText: '确定',
+    cancelText: '取消',
+    async onOk() {
+      try {
+        await tagApi.delete(id);
+        message.success('删除成功');
+        await loadData();
+      } catch (error) {
+        console.error('删除失败:', error);
+        message.error('删除失败');
+      }
+    }
+  });
 };
 
 const handleSubmit = async () => {
@@ -352,17 +348,20 @@ const handleSubmit = async () => {
 };
 
 const loadData = async () => {
+  loading.value = true;
   try {
     const params = {
       pageNumber: currentPage.value,
       pageSize: pageSize.value,
       name: searchQuery.value.name || undefined,
       status: searchQuery.value.status || undefined,
-      color: searchQuery.value.color || undefined,
     };
 
+    // 添加延迟加载
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+    await delay(500); // 添加500ms延迟
+
     const response = await tagApi.getList(params);
-    // 修改这里来匹配后端返回的数据结构
     tags.value = response.data.data;
     total.value = parseInt(response.data.total);
     currentPage.value = parseInt(response.data.pageNumber);
@@ -370,11 +369,14 @@ const loadData = async () => {
     totalPages.value = parseInt(response.data.totalPages);
   } catch (error) {
     console.error("加载失败:", error);
+  } finally {
+    loading.value = false;
   }
 };
 
 // 添加选择变化处理函数
 const handleSelectionChange = (selected) => {
+  console.log('选择变化，选中的数据:', selected);
   selectedRows.value = selected;
 };
 
@@ -387,12 +389,11 @@ const search = () => {
   loadData();
 };
 
-// 重置方法
+// 重置方法修改
 const reset = () => {
   searchQuery.value = {
     name: "",
-    status: "",
-    color: "",
+    status: undefined,
   };
   currentPage.value = 1;
   loadData();
@@ -401,21 +402,39 @@ const reset = () => {
 // 修改批量删除方法
 const batchDelete = async () => {
   if (selectedRows.value.length === 0) {
-    message.warning("请选择要删除的数据");
+    message.warning('请选择要删除的数据');
     return;
   }
 
-  try {
-    const ids = selectedRows.value.map((row) => row.id);
-    await tagApi.batchDelete(ids);
-    message.success("删除成功");
-    await loadData();
-    // 清空选中状态
-    selectedRows.value = [];
-  } catch (error) {
-    console.error("批量删除失败:", error);
-    message.error("删除失败");
-  }
+  // 添加调试日志
+  console.log('selectedRows.value:', selectedRows.value);
+
+  AModal.confirm({
+    title: '确认删除',
+    content: `确定要删除这 ${selectedRows.value.length} 条数据吗？`,
+    okText: '确定',
+    cancelText: '取消',
+    async onOk() {
+      try {
+        // 直接使用选中的值，因为它们本身就是id
+        const ids = Array.from(selectedRows.value).map(id => parseInt(id));
+        console.log('收集到的ids:', ids);
+        
+        if (ids.length === 0) {
+          message.error('未能获取到有效的ID');
+          return;
+        }
+
+        await tagApi.batchDelete(ids);
+        message.success('批量删除成功');
+        await loadData();
+        selectedRows.value = [];
+      } catch (error) {
+        console.error('批量删除失败:', error);
+        message.error('批量删除失败');
+      }
+    }
+  });
 };
 
 // 修改表格选择编辑按钮的处理方法
@@ -554,5 +573,16 @@ onMounted(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* 骨架屏自定义样式 */
+:deep(.ant-skeleton) {
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+:deep(.ant-skeleton-button) {
+  width: 100% !important;
 }
 </style>
