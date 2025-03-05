@@ -186,7 +186,8 @@
 
     <!-- 右侧登录区域 -->
     <div class="w-[340px] flex flex-col gap-5">
-      <LoginCard />
+      <!-- 修改这里：只在未登录时显示 LoginCard -->
+      <LoginCard v-if="!authStore.isAuthenticated" />
       <div class="sticky top-[10px]">
         <MustReadList :list="mustReadList" />
       </div>
@@ -199,6 +200,7 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick, watch, onUnmounted } from "vue";
+import { useAuthStore } from "@/stores/auth"; // 修改为使用 auth store
 import { tags } from "../../../api/frontend/tags.js";
 import { blog } from "../../../api/frontend/blog.js";
 import LoginCard from "../../../components/forum/NowLoginCard.vue";
@@ -224,6 +226,8 @@ import { Pagination as APagination } from "ant-design-vue";
 
 const router = useRouter();
 const route = useRoute();
+
+const authStore = useAuthStore(); // 修改为使用 auth store
 
 const selectedCard = ref(Number(route.params.category) || 1);
 
@@ -377,7 +381,8 @@ const fetchTags = async () => {
 };
 
 // 修改 onMounted 钩子，添加标签数据获取
-onMounted(() => {
+onMounted(async () => {
+  await authStore.initialize();
   fetchTags(); // 获取标签数据
 });
 
@@ -502,14 +507,9 @@ const clearTagSearch = () => {
   document.querySelector('input[placeholder="搜索标签..."]')?.focus();
 };
 
-// 添加编辑器ref
-const editorRef = ref(null);
-const vditorInstance = ref(null);
-
-// 添加编辑器挂载完成的处理函数
-const handleEditorMounted = (vdt) => {
-  vditorInstance.value = vdt;
-};
+// 添加缺失的引用变量
+const tagSearchQuery = ref("");
+const selectedSearchTags = ref([]);
 
 // 监听分类变化
 watch(

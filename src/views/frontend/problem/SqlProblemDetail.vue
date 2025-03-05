@@ -1,5 +1,5 @@
 <template>
-  <div class="w-screen h-screen overflow-hidden flex flex-col">
+  <div v-if="hasData" class="w-screen h-screen overflow-hidden flex flex-col">
     <TopBar :title="problem.title" @back="goBack" />
     <div class="flex-1 overflow-hidden bg-gray-100 p-2 min-h-0">
       <a-spin :spinning="loading" class="h-full">
@@ -101,14 +101,21 @@
       </a-spin>
     </div>
   </div>
+  <div
+    v-else-if="!loading"
+    class="w-full h-full flex items-center justify-center"
+  >
+    <span class="text-gray-500">暂无数据</span>
+  </div>
 </template>
 
 <script setup>
 import SqlContent from "../../../components/SqlContent.vue";
 import SqlEditor from "../../../components/SqlEditor.vue";
 import TopBar from "../../../components/TopBar.vue";
-import { ref, computed, nextTick, watch } from "vue";
+import { ref, computed, nextTick, watch, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { topic } from "../../../api/frontend/topic";
 import {
   ReadOutlined,
   SolutionOutlined,
@@ -125,103 +132,71 @@ import SubmissionHistory from "../../../components/problem/SubmissionHistory.vue
 import TestCasePanel from "../../../components/problem/TestCasePanel.vue";
 import TestResultPanel from "../../../components/problem/TestResultPanel.vue";
 
-const loading = ref(false);
+const loading = ref(true);
 const route = useRoute();
-const problem = ref({
-  id: route.params.id,
-  title: "按部门统计员工最高薪资",
-  difficulty: "中等",
-  description:
-    "请编写一个 SQL 查询，找出每个部门工资最高的员工。要求返回他们的姓名、薪水以及所在部门名称。结果按部门名称升序排列。",
-  passCount: 12345,
-  submitCount: 23456,
-  tags: ["数据库", "SQL", "GROUP BY", "JOIN", "聚合函数"],
-  tables: [
-    {
-      name: "Employees",
-      description: "员工信息表 - 存储了公司所有员工的基本信息",
-      columns: [
-        { name: "id", type: "INT", description: "员工ID（主键）" },
-        { name: "name", type: "VARCHAR(50)", description: "员工姓名" },
-        { name: "salary", type: "DECIMAL(10,2)", description: "月薪" },
-        {
-          name: "department_id",
-          type: "INT",
-          description: "所属部门ID（外键）",
-        },
-        { name: "hire_date", type: "DATE", description: "入职日期" },
-      ],
-    },
-    {
-      name: "Departments",
-      description: "部门信息表 - 存储了公司的部门信息",
-      columns: [
-        { name: "id", type: "INT", description: "部门ID（主键）" },
-        { name: "name", type: "VARCHAR(50)", description: "部门名称" },
-        { name: "manager_id", type: "INT", description: "部门主管ID" },
-        { name: "location", type: "VARCHAR(100)", description: "部门位置" },
-      ],
-    },
-  ],
-  expectedOutput: [
-    { 部门: "市场部", 员工姓名: "王五", 最高薪资: 22000.0 },
-    { 部门: "研发部", 员工姓名: "李四", 最高薪资: 28000.0 },
-  ],
-  difficulty_level: 3,
-  time_limit: 1000,
-  memory_limit: 256,
-  created_at: "2023-01-15",
-  updated_at: "2023-12-20",
-  author: "admin",
-  source: "内部原创",
-  hints: [
-    "考虑使用 JOIN 语句连接两个表",
-    "可以使用 GROUP BY 和聚合函数",
-    "注意处理 NULL 值的情况",
-  ],
-  examples: [
-    {
-      id: 1,
-      input: {
-        Employees: [
-          {
-            id: 1,
-            name: "张三",
-            salary: 25000,
-            department_id: 1,
-            hire_date: "2021-01-15",
-          },
-          {
-            id: 2,
-            name: "李四",
-            salary: 28000,
-            department_id: 1,
-            hire_date: "2020-11-20",
-          },
-          {
-            id: 3,
-            name: "王五",
-            salary: 22000,
-            department_id: 2,
-            hire_date: "2021-03-10",
-          },
-        ],
-        Departments: [
-          { id: 1, name: "研发部", manager_id: 2, location: "北京" },
-          { id: 2, name: "市场部", manager_id: 4, location: "上海" },
-        ],
-      },
-      output: [
-        { department_name: "市场部", employee_name: "王五", max_salary: 22000 },
-        { department_name: "研发部", employee_name: "李四", max_salary: 28000 },
-      ],
-    },
-  ],
-  isLiked: false,
-  isStarred: false,
-  likeCount: 1234,
-  commentCount: 56,
-  starCount: 789,
+const problem = ref({});
+
+// 修改获取题目详情的处理逻辑
+const fetchProblemDetail = async () => {
+  try {
+    loading.value = true;
+    const response = await topic.getTopicDetail(route.params.id);
+    console.log("API返回数据:", response); // 添加调试日志
+
+    if (response.code === 200 && response.data) {
+      const apiData = response.data;
+      console.log("处理前的数据:", apiData); // 添加调试日志
+
+      // 转换数据结构
+      const transformedData = {
+        id: apiData.id,
+        title: apiData.title || "SQL题目",
+        difficulty: apiData.difficulty,
+        description: apiData.content || "",
+        tables:
+          apiData.topicTableList?.map((table) => ({
+            name: table.name,
+            description: table.description,
+            columns: table.columnList?.map((col) => ({
+              name: col.name,
+              type: col.type,
+              description: col.description,
+            })),
+          })) || [],
+        examples:
+          apiData.testTopicList?.map((test) => ({
+            input: test.inputList?.reduce((acc, input) => {
+              acc[input.tableName] = input.data;
+              return acc;
+            }, {}),
+            output: test.outputList || [],
+          })) || [],
+        passCount: apiData.passNum || 0,
+        submitCount: apiData.submitNum || 0,
+        isLiked: apiData.isThumb || false,
+        isStarred: apiData.isFavour || false,
+        likeCount: apiData.thumbNum || 0,
+        commentCount: 0,
+        starCount: apiData.favourNum || 0,
+        tags: apiData.tagList || [],
+        hints: [],
+      };
+
+      console.log("处理后的数据:", transformedData); // 添加调试日志
+      problem.value = transformedData;
+    } else {
+      console.error("API响应异常:", response);
+    }
+  } catch (error) {
+    console.error("获取题目详情失败:", error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+// 在组件挂载时获取题目详情
+onMounted(() => {
+  fetchProblemDetail();
 });
 
 const router = useRouter();
@@ -469,6 +444,11 @@ const testResult = ref([
     error: "ERROR 1054 (42S22): Unknown column 'xxx' in 'field list'",
   },
 ]);
+
+// 添加防止空数据渲染的计算属性
+const hasData = computed(() => {
+  return problem.value && Object.keys(problem.value).length > 0;
+});
 </script>
 
 <style scoped>
