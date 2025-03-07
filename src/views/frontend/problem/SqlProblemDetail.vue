@@ -136,16 +136,55 @@ const loading = ref(true);
 const route = useRoute();
 const problem = ref({});
 
+// 移除原来的静态 testCases 数据，改为响应式引用
+const testCases = ref([]);
+
+// 移除原来的静态 testResult 数据，改为响应式引用
+const testResult = ref([]);
+
 // 修改获取题目详情的处理逻辑
 const fetchProblemDetail = async () => {
   try {
     loading.value = true;
     const response = await topic.getTopicDetail(route.params.id);
-    console.log("API返回数据:", response); // 添加调试日志
 
     if (response.code === 200 && response.data) {
       const apiData = response.data;
-      console.log("处理前的数据:", apiData); // 添加调试日志
+
+      // 处理测试用例数据，包含输入和期望输出
+      testCases.value =
+        apiData.testTopicList?.map((testTopic) => {
+          const inputTables = testTopic.inputList?.map((input) => ({
+            name: input.tableName,
+            columns: Object.keys(input.data[0] || {}),
+            data: input.data,
+          }));
+
+          // 添加期望输出数据
+          const expectedOutput = {
+            name: "输出",
+            columns: testTopic.outputList?.[0]?.columns || [],
+            data: testTopic.outputList?.[0]?.data || [],
+          };
+
+          return [...(inputTables || []), expectedOutput];
+        }) || [];
+
+      // 处理测试结果数据
+      testResult.value =
+        apiData.testTopicList?.map((testTopic) => ({
+          status: "待执行",
+          executionTime: 0,
+          testCase: testTopic.inputList?.map((input) => ({
+            name: input.tableName,
+            columns: Object.keys(input.data[0] || {}),
+            data: input.data,
+          })),
+          output: {
+            headers: testTopic.outputList?.[0]?.columns || [],
+            rows: testTopic.outputList?.[0]?.data || [],
+          },
+        })) || [];
 
       // 转换数据结构
       const transformedData = {
@@ -164,13 +203,21 @@ const fetchProblemDetail = async () => {
             })),
           })) || [],
         examples:
-          apiData.testTopicList?.map((test) => ({
-            input: test.inputList?.reduce((acc, input) => {
-              acc[input.tableName] = input.data;
-              return acc;
-            }, {}),
-            output: test.outputList || [],
-          })) || [],
+          apiData.testTopicList?.length > 0
+            ? [
+                {
+                  // 只取第一条测试用例
+                  input: apiData.testTopicList[0].inputList?.reduce(
+                    (acc, input) => {
+                      acc[input.tableName] = input.data;
+                      return acc;
+                    },
+                    {}
+                  ),
+                  output: apiData.testTopicList[0].outputList || [],
+                },
+              ]
+            : [],
         passCount: apiData.passNum || 0,
         submitCount: apiData.submitNum || 0,
         isLiked: apiData.isThumb || false,
@@ -342,106 +389,6 @@ const mockSubmissions = ref([
     language: "mysql",
     submitTime: "2024-01-20 10:20:00",
     note: "需要优化查询性能",
-  },
-]);
-
-// 添加测试用例数据
-const testCases = [
-  [
-    {
-      name: "Employees",
-      columns: ["id", "name", "salary", "department_id", "hire_date"],
-      data: [
-        {
-          id: 1,
-          name: "张三",
-          salary: 25000,
-          department_id: 1,
-          hire_date: "2021-01-15",
-        },
-        {
-          id: 2,
-          name: "李四",
-          salary: 28000,
-          department_id: 1,
-          hire_date: "2020-11-20",
-        },
-        {
-          id: 3,
-          name: "王五",
-          salary: 22000,
-          department_id: 2,
-          hire_date: "2021-03-10",
-        },
-      ],
-    },
-    {
-      name: "Departments",
-      columns: ["id", "name", "manager_id", "location"],
-      data: [
-        { id: 1, name: "研发部", manager_id: 2, location: "北京" },
-        { id: 2, name: "市场部", manager_id: 4, location: "上海" },
-      ],
-    },
-  ],
-  [
-    {
-      name: "Employees",
-      columns: ["id", "name", "salary", "department_id", "hire_date"],
-      data: [
-        {
-          id: 1,
-          name: "Jack",
-          salary: 15000,
-          department_id: 1,
-          hire_date: "2021-01-15",
-        },
-        {
-          id: 2,
-          name: "Tom",
-          salary: 18000,
-          department_id: 1,
-          hire_date: "2020-11-20",
-        },
-        {
-          id: 3,
-          name: "Mary",
-          salary: 12000,
-          department_id: 2,
-          hire_date: "2021-03-10",
-        },
-      ],
-    },
-    {
-      name: "Departments",
-      columns: ["id", "name", "manager_id", "location"],
-      data: [
-        { id: 1, name: "IT", manager_id: 2, location: "New York" },
-        { id: 2, name: "HR", manager_id: 4, location: "Boston" },
-      ],
-    },
-  ],
-];
-
-// 修改测试结果数据
-const testResult = ref([
-  {
-    status: "执行通过",
-    executionTime: 125,
-    testCase: testCases[0], // 引用对应的测试用例数据
-    output: {
-      headers: ["department_name", "employee_name", "max_salary"],
-      rows: [
-        { department_name: "市场部", employee_name: "王五", max_salary: 22000 },
-        { department_name: "研发部", employee_name: "李四", max_salary: 28000 },
-      ],
-    },
-  },
-  {
-    status: "执行错误",
-    executionTime: 0,
-    testCase: testCases[1],
-    error: "ERROR 1054 (42S22): Unknown column 'xxx' in 'field list'",
   },
 ]);
 

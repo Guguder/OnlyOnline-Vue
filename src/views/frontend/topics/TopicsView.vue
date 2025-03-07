@@ -124,6 +124,8 @@
               />
               <input
                 type="text"
+                v-model="searchQuery"
+                @input="handleSearch"
                 placeholder="搜索题目、编号或内容"
                 class="w-full pl-10 pr-4 py-2 bg-[#F2F3F4] rounded-lg text-sm"
               />
@@ -140,6 +142,20 @@
         <div class="mt-6">
           <!-- 添加这个包装 div 来增加间距 -->
           <ProblemList :problems="problems" />
+          <!-- 调整分页组件样式 -->
+          <div class="flex justify-center items-center py-6">
+            <a-pagination
+              v-model:current="currentPage"
+              v-model:pageSize="pageSize"
+              :total="total"
+              :default-page-size="20"
+              :page-size-options="['10', '20', '30', '50']"
+              show-size-changer
+              class="pagination-custom"
+              @change="handleCurrentChange"
+              @showSizeChange="handleSizeChange"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -159,89 +175,70 @@ import QuestionBank from "../../../components/topics/TopicsBank.vue";
 import RankingList from "../../../components/forum/RankingList.vue";
 import ProblemList from "../../../components/topics/TopicList.vue";
 import { Search, Shuffle, CheckCircle2, Circle, Lock } from "lucide-vue-next";
+import { Pagination as APagination } from "ant-design-vue";
 import { ref, onMounted } from "vue";
-import { getBankList } from '../../../api/frontend/bank.js';
+import { getBankList } from "../../../api/frontend/bank.js";
+import { getTopicList } from "../../../api/frontend/topic.js";
 
-const problems = ref([
-  {
-    id: 1,
-    status: "none",
-    title: "175. 组合两个表",
-    solutions: "1523",
-    passRate: "92.5%",
-    difficulty: "简单",
-    type: "sql", // 添加类型标识
-  },
-  {
-    id: 2,
-    status: "none",
-    title: "176. 第二高的薪水",
-    solutions: "2634",
-    passRate: "85.3%",
-    difficulty: "中等",
-    type: "sql",
-  },
-  {
-    id: 3,
-    status: "none",
-    title: "177. 第N高的薪水",
-    solutions: "1835",
-    passRate: "74.7%",
-    difficulty: "中等",
-    type: "sql",
-  },
-  {
-    id: 4,
-    status: "none",
-    title: "178. 分数排名",
-    solutions: "1326",
-    passRate: "60.5%",
-    difficulty: "中等",
-    type: "sql",
-  },
-  {
-    id: 5,
-    status: "none",
-    title: "180. 连续出现的数字",
-    solutions: "958",
-    passRate: "55.9%",
-    difficulty: "困难",
-    type: "sql",
-  },
-]);
+// 分页相关的响应式变量
+const currentPage = ref(1);
+const pageSize = ref(20);
+const total = ref(0);
+const searchQuery = ref("");
+const problems = ref([]); // 保留这个声明
+
+// 获取题目列表
+const fetchTopicList = async () => {
+  try {
+    const params = {
+      pageNumber: currentPage.value,
+      pageSize: pageSize.value,
+      keyword: searchQuery.value,
+    };
+    const result = await getTopicList(params);
+    if (result.code === 200) {
+      // 转换数据格式以匹配组件需求
+      problems.value = result.data.data.map((item) => ({
+        id: item.id,
+        status: "none",
+        title: item.title,
+        solutions: item.solutionNum.toString(),
+        passRate: item.passingRate + "%",
+        difficulty: ["简单", "中等", "困难"][item.difficulty],
+        type: "sql", // 可以根据实际情况调整
+      }));
+      total.value = parseInt(result.data.total);
+    }
+  } catch (error) {
+    console.error("获取题目列表失败:", error);
+  }
+};
+
+// 处理页码变化
+const handleCurrentChange = (page) => {
+  currentPage.value = page;
+  fetchTopicList();
+};
+
+// 处理每页数量变化
+const handleSizeChange = (size) => {
+  pageSize.value = size;
+  currentPage.value = 1; // 重置到第一页
+  fetchTopicList();
+};
+
+// 处理搜索
+const handleSearch = () => {
+  currentPage.value = 1; // 重置到第一页
+  fetchTopicList();
+};
+
+onMounted(() => {
+  fetchTopicList();
+});
+
 // 修改 cardDataList 的定义为响应式引用
 const cardDataList = ref([]);
-
-// JSON 数据
-// const cardDataList = [
-//   {
-//     icon: "TOP",
-//     title: "面试经典 150 题",
-//     description: "123",
-//   },
-//   {
-//     icon: "NEW",
-//     title: "高频算法精选",
-//     description: "收录近几年面试的高频算法问题算法问题算法问题算法问题算法问题",
-//   },
-//   {
-//     icon: "HOT",
-//     title: "热门框架深度剖析",
-//     description:
-//       "从源码角度理解热门框架，提升核心竞争力心竞争力心竞争力心竞争力心竞争力",
-//   },
-//   {
-//     icon: "JS",
-//     title: "JavaScript 面试指南",
-//     description:
-//       "从基础到进阶，深入探讨 JavaScript 面试问题面试问题面试问题面试问题面试问题",
-//   },
-//   {
-//     icon: "DB",
-//     title: "数据库面试解析",
-//     description: "系统性学习数据库基础与高级操作",
-//   },
-// ];
 
 // 排行榜数据
 const rankingList = [
@@ -379,7 +376,22 @@ const fetchBankList = async () => {
       cardDataList.value = result.data.data;
     }
   } catch (error) {
-    console.error('获取题库列表失败:', error);
+    console.error("获取题库列表失败:", error);
   }
 };
 </script>
+
+<style scoped>
+/* 覆盖 Ant Design Vue 的分页图标样式 */
+:deep(.ant-pagination) .anticon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:deep(.ant-pagination-item-link) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>

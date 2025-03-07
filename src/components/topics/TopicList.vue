@@ -1,5 +1,6 @@
 <template>
-  <div class="bg-white rounded-lg shadow overflow-x-auto">
+  <div class="bg-white rounded-lg overflow-x-auto">
+    <!-- 移除了 shadow 类 -->
     <table class="w-full">
       <thead class="bg-gray-50">
         <tr class="h-12">

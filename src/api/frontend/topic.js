@@ -1,5 +1,13 @@
 import request from '../../utils/request.js'
 
+export const getTopicList = (params) => {
+  return request({
+    url: '/topic/list',
+    method: 'get',
+    params
+  });
+};
+
 export const topic = {
     // 获取题库题目列表
     getTopicListByBankId(bankId) {
