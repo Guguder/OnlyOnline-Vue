@@ -1,6 +1,6 @@
 <!-- TopBar.vue -->
 <template>
-  <div class="w-full px-4 pt-2 flex items-center">
+  <div class="w-full px-4 py-2 flex items-center">
     <!-- 左侧区域 -->
     <div class="flex items-center gap-4 flex-1">
       <left-outlined

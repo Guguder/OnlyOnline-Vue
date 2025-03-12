@@ -1,7 +1,7 @@
 <template>
   <div v-if="hasData" class="w-screen h-screen overflow-hidden flex flex-col">
     <TopBar :title="problem.title" @back="goBack" />
-    <div class="flex-1 overflow-hidden bg-gray-100 p-2 min-h-0">
+    <div class="flex-1 overflow-hidden bg-gray-100 px-2 min-h-0">
       <a-spin :spinning="loading" class="h-full">
         <split-pane
           direction="horizontal"
@@ -152,23 +152,9 @@ const fetchProblemDetail = async () => {
       const apiData = response.data;
 
       // 处理测试用例数据，包含输入和期望输出
-      testCases.value =
-        apiData.testTopicList?.map((testTopic) => {
-          const inputTables = testTopic.inputList?.map((input) => ({
-            name: input.tableName,
-            columns: Object.keys(input.data[0] || {}),
-            data: input.data,
-          }));
+      testCases.value = apiData.testTopicList || [];
 
-          // 添加期望输出数据
-          const expectedOutput = {
-            name: "输出",
-            columns: testTopic.outputList?.[0]?.columns || [],
-            data: testTopic.outputList?.[0]?.data || [],
-          };
-
-          return [...(inputTables || []), expectedOutput];
-        }) || [];
+      console.log("testCases:", testCases.value);
 
       // 处理测试结果数据
       testResult.value =

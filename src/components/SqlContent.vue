@@ -1,6 +1,6 @@
 <template>
   <div
-    class="h-[calc(100vh-theme(space.20))] w-full bg-white rounded-lg shadow-sm overflow-hidden flex flex-col relative"
+    class="h-[calc(100vh-56px)] w-full bg-white rounded-lg shadow-sm overflow-hidden flex flex-col relative"
   >
     <!-- 展开按钮 -->
     <menu-unfold-outlined
