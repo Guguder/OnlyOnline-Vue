@@ -8,10 +8,8 @@
             v-for="(column, index) in columns"
             :key="column.key"
             :style="{
-              width:
-                index === columns.length - 1 && column.action
-                  ? '100px'
-                  : column.width || 'auto',
+              width: column.action ? '120px' : column.width || 'auto',
+              minWidth: column.action ? '120px' : undefined,
             }"
           />
         </colgroup>
@@ -143,5 +141,9 @@ td {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+td {
+  max-width: 0; /* 添加这一行以确保单元格内容能够正确截断 */
 }
 </style>

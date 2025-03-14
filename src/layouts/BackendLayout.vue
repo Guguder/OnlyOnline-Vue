@@ -139,9 +139,27 @@ import {
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
+
+// 根据路径获取应该展开的菜单键值
+const getOpenKey = (path) => {
+  if (path.includes("/backend/dashboard") || path.includes("/backend/users")) {
+    return "system";
+  } else if (path.includes("/backend/problem")) {
+    return "problem";
+  } else if (
+    path.includes("/backend/posts") ||
+    path.includes("/backend/comments")
+  ) {
+    return "forum";
+  } else if (path.includes("/backend/tags")) {
+    return "common";
+  }
+  return "";
+};
+
 const collapsed = ref(false);
 const selectedKeys = ref([route.path]);
-const openKeys = ref(["system"]); // 默认展开系统管理
+const openKeys = ref([getOpenKey(route.path)]);
 
 const handleLogout = () => {
   authStore.logout();
@@ -161,6 +179,10 @@ watch(
   () => route.path,
   (newPath) => {
     selectedKeys.value = [newPath];
+    const openKey = getOpenKey(newPath);
+    if (openKey && !openKeys.value.includes(openKey)) {
+      openKeys.value = [openKey];
+    }
   }
 );
 </script>

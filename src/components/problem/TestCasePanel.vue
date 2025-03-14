@@ -1,106 +1,110 @@
 <template>
   <div class="bg-white h-full flex flex-col">
+    <!-- 测试用例内容 -->
     <div class="flex-1 overflow-y-auto min-h-0">
-      <!-- 测试用例选择按钮 -->
+      <!-- 测试用例选择器 -->
       <div class="px-4 py-2 flex gap-2">
         <button
-          v-for="(_, index) in testCases"
-          :key="index"
-          class="px-3 py-1.5 rounded text-sm font-medium transition-colors"
-          :class="[
+            v-for="(_, index) in testCases"
+            :key="index"
+            class="px-3 py-1.5 rounded text-sm font-medium transition-colors"
+            :class="[
             currentIndex === index
               ? 'bg-gray-100 text-gray-900'
               : 'text-gray-600 hover:bg-gray-50',
           ]"
-          @click="currentIndex = index"
+            @click="currentIndex = index"
         >
           Case {{ index + 1 }}
         </button>
       </div>
 
-      <div class="px-4 py-2 space-y-6">
-        <!-- 输入数据 -->
-        <div v-for="table in currentCase.inputList" :key="table.tableName">
-          <div class="text-sm font-medium text-gray-900 mb-2">
-            {{ table.tableName }} =
-          </div>
-          <div class="table-container">
-            <div class="terminal-table-wrapper">
-              <div class="terminal-table">
-                <!-- 表头 -->
-                <div class="table-header">
-                  <div
-                    v-for="(col, index) in Object.keys(table.data[0] || {})"
-                    :key="index"
-                    class="table-cell"
-                  >
-                    {{ col }}
-                  </div>
-                </div>
-                <!-- 数据行 -->
-                <div
-                  v-for="(row, index) in table.data"
-                  :key="index"
-                  class="table-row"
-                >
-                  <div
-                    v-for="(value, col) in row"
-                    :key="col"
-                    class="table-cell"
-                  >
-                    {{ value }}
+      <div class="px-4 py-2 space-y-4">
+          <div>
+            <!-- 输入数据 -->
+            <div v-for="table in currentCase.inputList" :key="table.tableName">
+              <div class="text-sm font-medium text-gray-900 mb-2">
+                {{ table.tableName }} =
+              </div>
+              <div class="table-container">
+                <div class="terminal-table-wrapper">
+                  <div class="terminal-table">
+                    <!-- 表头 -->
+                    <div class="table-header">
+                      <div
+                          v-for="(col, index) in Object.keys(table.data[0] || {})"
+                          :key="index"
+                          class="table-cell"
+                      >
+                        {{ col }}
+                      </div>
+                    </div>
+                    <!-- 数据行 -->
+                    <div
+                        v-for="(row, index) in table.data"
+                        :key="index"
+                        class="table-row"
+                    >
+                      <div
+                          v-for="(value, col) in row"
+                          :key="col"
+                          class="table-cell"
+                      >
+                        {{ value }}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- 输出数据 -->
-        <div class="text-sm font-medium text-gray-900 mb-2">结果：</div>
-        <div class="table-container">
-          <div class="terminal-table-wrapper">
-            <div class="terminal-table">
-              <!-- 先获取所有列名（从 outputList 的第一项获取字段名） -->
-              <div v-if="currentCase.outputList.length > 0">
-                <div class="table-header">
-                  <div
-                    v-for="(col, index) in Object.keys(
+            <!-- 输出数据 -->
+
+            <div class="table-container">
+              <div class="text-sm font-medium text-gray-900 mb-2">结果：</div>
+              <div class="terminal-table-wrapper">
+                <div class="terminal-table">
+                  <!-- 先获取所有列名（从 outputList 的第一项获取字段名） -->
+                  <div v-if="currentCase.outputList.length > 0">
+                    <div class="table-header">
+                      <div
+                          v-for="(col, index) in Object.keys(
                       currentCase.outputList[0]
                     )"
-                    :key="index"
-                    class="table-cell"
-                  >
-                    {{ col }}
-                  </div>
-                </div>
+                          :key="index"
+                          class="table-cell"
+                      >
+                        {{ col }}
+                      </div>
+                    </div>
 
-                <!-- 遍历所有 outputList 数据，合并到一个表格 -->
-                <div
-                  v-for="(row, rowIndex) in currentCase.outputList"
-                  :key="rowIndex"
-                  class="table-row"
-                >
-                  <div
-                    v-for="(value, col) in row"
-                    :key="col"
-                    class="table-cell"
-                  >
-                    {{ value }}
+                    <!-- 遍历所有 outputList 数据，合并到一个表格 -->
+                    <div
+                        v-for="(row, rowIndex) in currentCase.outputList"
+                        :key="rowIndex"
+                        class="table-row"
+                    >
+                      <div
+                          v-for="(value, col) in row"
+                          :key="col"
+                          class="table-cell"
+                      >
+                        {{ value }}
+                      </div>
+                    </div>
                   </div>
+                  <div v-else class="text-gray-500 text-sm">暂无数据</div>
                 </div>
               </div>
-              <div v-else class="text-gray-500 text-sm">暂无数据</div>
             </div>
           </div>
-        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import {ref, computed} from "vue";
 
 // 修改 props 定义，确保 testCases 的数据结构包含 input 和 output
 const props = defineProps({
@@ -120,7 +124,7 @@ const props = defineProps({
 const currentIndex = ref(0);
 const currentCase = computed(() => {
   return (
-    props.testCases[currentIndex.value] || { inputList: [], outputList: [] }
+      props.testCases[currentIndex.value] || {inputList: [], outputList: []}
   );
 });
 </script>

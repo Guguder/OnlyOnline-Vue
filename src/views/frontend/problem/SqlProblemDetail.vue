@@ -6,10 +6,9 @@
         <split-pane
           direction="horizontal"
           :default-ratio="40"
-          :min-size="36"
+          :min-size="40"
           :current-ratio="splitRatio"
           @update:ratio="handleRatioChange"
-          class="h-full"
         >
           <template #first>
             <sql-content
@@ -55,10 +54,9 @@
             <split-pane
               direction="vertical"
               :default-ratio="70"
-              :min-size="36"
+              :min-size="40"
               :current-ratio="verticalSplitRatio"
               @update:ratio="handleVerticalRatioChange"
-              class="h-[calc(100vh-theme(space.20)-0.5rem)]"
             >
               <template #first>
                 <sql-editor
@@ -154,7 +152,6 @@ const fetchProblemDetail = async () => {
       // 处理测试用例数据，包含输入和期望输出
       testCases.value = apiData.testTopicList || [];
 
-      console.log("testCases:", testCases.value);
 
       // 处理测试结果数据
       testResult.value =

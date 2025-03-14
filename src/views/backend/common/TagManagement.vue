@@ -39,7 +39,7 @@
 
         <!-- 按钮组 -->
         <div class="flex items-center gap-3 px-5 py-5">
-          <!-- 新增按钮（绿色） -->
+          <!-- 新增按钮 -->
           <button
             class="px-5 py-1.5 bg-green-500 text-white rounded-lg shadow-sm hover:bg-green-600"
             @click="openModal"
@@ -47,7 +47,7 @@
             新增
           </button>
 
-          <!-- 修改按钮（蓝色） -->
+          <!-- 修改按钮 -->
           <button
             class="px-5 py-1.5 bg-blue-500 text-white rounded-lg shadow-sm hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
             @click="edit"
@@ -56,7 +56,7 @@
             修改
           </button>
 
-          <!-- 批量删除按钮（深红色） -->
+          <!-- 批量删除按钮 -->
           <button
             class="px-4 py-1.5 bg-red-700 text-white rounded-lg shadow-sm hover:bg-red-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
             @click="batchDelete"
@@ -69,15 +69,7 @@
 
       <!-- 可滚动的列表区域 -->
       <div class="flex-1 min-h-0 px-5 overflow-y-auto custom-scrollbar">
-        <a-skeleton :loading="loading" active :paragraph="{ rows: 7 }" v-if="loading">
-          <template #title>
-            <a-space direction="vertical" style="width: 100%">
-              <a-skeleton-button :active="true" size="large" block />
-            </a-space>
-          </template>
-        </a-skeleton>
         <CommonTable
-          v-else
           :columns="columns"
           :data="tags"
           :selectable="true"
@@ -203,8 +195,6 @@ import {
   Button as AButton,
   message,
   Modal as AModal,
-  Skeleton as ASkeleton,
-  SkeletonButton as ASkeletonButton,
 } from "ant-design-vue";
 import BaseModal from "../../../components/common/BaseModal.vue";
 
@@ -292,20 +282,20 @@ const handleEdit = (tag) => {
 // 修改单个删除方法
 const handleDelete = async (id) => {
   AModal.confirm({
-    title: '确认删除',
-    content: '确定要删除这条数据吗？',
-    okText: '确定',
-    cancelText: '取消',
+    title: "确认删除",
+    content: "确定要删除这条数据吗？",
+    okText: "确定",
+    cancelText: "取消",
     async onOk() {
       try {
         await tagApi.delete(id);
-        message.success('删除成功');
+        message.success("删除成功");
         await loadData();
       } catch (error) {
-        console.error('删除失败:', error);
-        message.error('删除失败');
+        console.error("删除失败:", error);
+        message.error("删除失败");
       }
-    }
+    },
   });
 };
 
@@ -357,10 +347,6 @@ const loadData = async () => {
       status: searchQuery.value.status || undefined,
     };
 
-    // 添加延迟加载
-    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-    await delay(500); // 添加500ms延迟
-
     const response = await tagApi.getList(params);
     tags.value = response.data.data;
     total.value = parseInt(response.data.total);
@@ -376,7 +362,7 @@ const loadData = async () => {
 
 // 添加选择变化处理函数
 const handleSelectionChange = (selected) => {
-  console.log('选择变化，选中的数据:', selected);
+  console.log("选择变化，选中的数据:", selected);
   selectedRows.value = selected;
 };
 
@@ -402,38 +388,38 @@ const reset = () => {
 // 修改批量删除方法
 const batchDelete = async () => {
   if (selectedRows.value.length === 0) {
-    message.warning('请选择要删除的数据');
+    message.warning("请选择要删除的数据");
     return;
   }
 
   // 添加调试日志
-  console.log('selectedRows.value:', selectedRows.value);
+  console.log("selectedRows.value:", selectedRows.value);
 
   AModal.confirm({
-    title: '确认删除',
+    title: "确认删除",
     content: `确定要删除这 ${selectedRows.value.length} 条数据吗？`,
-    okText: '确定',
-    cancelText: '取消',
+    okText: "确定",
+    cancelText: "取消",
     async onOk() {
       try {
         // 直接使用选中的值，因为它们本身就是id
-        const ids = Array.from(selectedRows.value).map(id => parseInt(id));
-        console.log('收集到的ids:', ids);
-        
+        const ids = Array.from(selectedRows.value).map((id) => parseInt(id));
+        console.log("收集到的ids:", ids);
+
         if (ids.length === 0) {
-          message.error('未能获取到有效的ID');
+          message.error("未能获取到有效的ID");
           return;
         }
 
         await tagApi.batchDelete(ids);
-        message.success('批量删除成功');
+        message.success("批量删除成功");
         await loadData();
         selectedRows.value = [];
       } catch (error) {
-        console.error('批量删除失败:', error);
-        message.error('批量删除失败');
+        console.error("批量删除失败:", error);
+        message.error("批量删除失败");
       }
-    }
+    },
   });
 };
 
@@ -573,16 +559,5 @@ onMounted(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/* 骨架屏自定义样式 */
-:deep(.ant-skeleton) {
-  padding: 20px;
-  background: #fff;
-  border-radius: 8px;
-}
-
-:deep(.ant-skeleton-button) {
-  width: 100% !important;
 }
 </style>

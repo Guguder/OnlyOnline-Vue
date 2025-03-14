@@ -3,10 +3,16 @@
   <div class="w-full px-4 py-2 flex items-center">
     <!-- 左侧区域 -->
     <div class="flex items-center gap-4 flex-1">
-      <left-outlined
-        class="text-gray-500 cursor-pointer hover:text-gray-700 w-4"
+      <a-button
+        type="text"
+        class="flex items-center justify-center !px-2"
         @click="$emit('back')"
-      />
+      >
+        <template #icon
+          ><left-outlined
+            class="text-gray-500 cursor-pointer hover:text-gray-700 w-4"
+        /></template>
+      </a-button>
       <div class="flex items-center gap-2">
         <span class="text-gray-500">SQL题库</span>
         <span class="text-gray-300">/</span>
@@ -40,15 +46,51 @@
 
     <!-- 右侧工具栏 -->
     <div class="flex-1 flex justify-end items-center gap-2">
-      <!-- 计时器按钮组容器 -->
       <Timer />
       <a-button type="text" class="flex items-center justify-center !px-2">
         <template #icon><snippets-outlined /></template>
       </a-button>
-      <a-avatar
-        :size="32"
-        src="https://api.dicebear.com/7.x/miniavs/svg?seed=1"
-      />
+
+      <!-- 复用 HeaderNavbar 的头像模块 -->
+      <template v-if="!authStore.isAuthenticated || authStore.loading">
+        <a-button @click="showLoginModal">登录</a-button>
+      </template>
+      <template v-else-if="authStore.userInfo">
+        <a-dropdown :trigger="['click']">
+          <a-avatar
+            :size="32"
+            class="cursor-pointer hover:opacity-80 transition-opacity"
+            :src="authStore.userInfo?.avatar || '默认头像URL'"
+          />
+          <template #overlay>
+            <a-menu>
+              <a-menu-item key="profile" @click="handleProfileClick">
+                <div class="menu-item-content">
+                  <UserOutlined />
+                  <span>个人中心</span>
+                </div>
+              </a-menu-item>
+              <a-menu-item
+                v-if="authStore.userInfo?.role === 0"
+                key="backend"
+                @click="goToBackend"
+              >
+                <div class="menu-item-content">
+                  <SettingOutlined />
+                  <span>后台管理</span>
+                </div>
+              </a-menu-item>
+              <a-menu-divider />
+              <a-menu-item key="logout" @click="handleLogout">
+                <div class="menu-item-content">
+                  <LogoutOutlined />
+                  <span>退出登录</span>
+                </div>
+              </a-menu-item>
+            </a-menu>
+          </template>
+        </a-dropdown>
+      </template>
     </div>
   </div>
 </template>
@@ -60,9 +102,19 @@ import {
   CaretRightOutlined,
   CheckCircleOutlined,
   SnippetsOutlined,
+  UserOutlined,
+  SettingOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons-vue";
-import { Button, Avatar } from "ant-design-vue";
+import { Button, Avatar, Dropdown, Menu } from "ant-design-vue";
 import Timer from "./Timer.vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "../stores/auth";
+import { useLoginModal } from "../stores/useLoginModal";
+
+const router = useRouter();
+const authStore = useAuthStore();
+const { showLoginModal } = useLoginModal();
 
 defineProps({
   title: {
@@ -72,4 +124,47 @@ defineProps({
 });
 
 defineEmits(["back"]);
+
+const handleProfileClick = () => {
+  router.push("/personal-center");
+};
+
+const handleLogout = () => {
+  authStore.logout();
+  router.push("/home");
+};
+
+const goToBackend = () => {
+  router.push("/backend");
+};
 </script>
+
+<style scoped>
+/* 复用 HeaderNavbar 的头像样式 */
+:deep(.ant-avatar) {
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+:deep(.ant-avatar:hover) {
+  border-color: #1890ff;
+  transform: scale(1.05);
+}
+
+.menu-item-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+:deep(.ant-dropdown-menu) {
+  padding: 4px;
+  border-radius: 8px;
+}
+
+:deep(.ant-dropdown-menu-item) {
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+</style>
