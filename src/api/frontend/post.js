@@ -1,6 +1,6 @@
 import request from '../../utils/request.js'
 
-export const blog = {
+export const post = {
     // 发布博客
     createPost(data) {
         return request({
@@ -20,7 +20,7 @@ export const blog = {
     // 获取帖子详情
     getPostDetail(id) {
         return request({
-            url: `/blog/post/info/${id}`,
+            url: `/blog/post/detail/${id}`,
             method: 'get'
         })
     },
@@ -48,5 +48,13 @@ export const blog = {
     // 获取子评论列表
     getChildReplyList(replyId) {
         return request.get(`/reply/child/list?replyId=${replyId}`);
+    },
+    // 获取首页文章列表
+    getHomePostList(params) {
+        return request({
+            url: '/blog/post/home/list',
+            method: 'get',
+            params
+        })
     }
 }

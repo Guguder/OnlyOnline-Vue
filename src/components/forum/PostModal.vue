@@ -168,7 +168,7 @@ import {
   Share2,
   PenLine,
 } from "lucide-vue-next";
-import { blog } from "../../api/frontend/blog.js";
+import { post } from "../../api/frontend/post.js";
 import { tags } from "../../api/frontend/tags.js";
 import { Checkbox as ACheckbox } from "ant-design-vue"; // 确保引入了 Checkbox
 
@@ -327,7 +327,7 @@ const publishPost = async () => {
       content: editorContent.trim(),
     };
 
-    const result = await blog.createPost(postData);
+    const result = await post.createPost(postData);
 
     if (result.code === 200) {
       message.destroy();

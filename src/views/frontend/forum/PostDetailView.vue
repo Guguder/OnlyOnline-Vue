@@ -280,7 +280,7 @@ import {
 import {formatNumber} from "../../../utils/format.js";
 import CommentList from "../../../components/comment/CommentList.vue";
 import {withAuth} from "../../../utils/authGuard.js";
-import {blog} from "../../../api/frontend/blog.js";
+import {post} from "../../../api/frontend/post.js";
 import Vditor from "vditor";
 import "vditor/dist/index.css";
 import {message} from "ant-design-vue";
@@ -326,9 +326,9 @@ const fetchPostDetail = async () => {
     const id = route.params.id;
 
     // 1. 获取帖子详情
-    const result = await blog.getPostDetail(id);
+    const result = await post.getPostDetail(id);
     // 2. 获取评论列表以获取总数
-    const replyResult = await blog.getReplyList({
+    const replyResult = await post.getReplyList({
       postId: id,
       pageNumber: 1,
       pageSize: 5,
@@ -550,7 +550,7 @@ const handleSubmitReply = withAuth(async () => {
       };
     }
 
-    const result = await blog.sendReply(replyData);
+    const result = await post.sendReply(replyData);
 
     if (result.code === 200) {
       message.success("回复成功");
@@ -624,7 +624,7 @@ const expandedCommentIds = ref(new Set());
 const fetchComments = async () => {
   commentsLoading.value = true;
   try {
-    const result = await blog.getReplyList({
+    const result = await post.getReplyList({
       postId: route.params.id,
       pageNumber: currentPage.value,
       pageSize: pageSize.value,
@@ -667,7 +667,7 @@ const handleExpandComment = async (comment, force = false) => {
   try {
     // 如果是强制展开或当前未展开
     if (force || !comment.isExpanded) {
-      const result = await blog.getChildReplyList(comment.id);
+      const result = await post.getChildReplyList(comment.id);
       if (result.code === 200) {
         comment.childReplies = result.data.map(reply => ({
           id: reply.id,

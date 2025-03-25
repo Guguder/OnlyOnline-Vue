@@ -155,35 +155,87 @@
     <!-- 使用新的模态框组件 -->
     <BaseModal
       v-model="showModal"
-      :title="isEdit ? '编辑标签' : '新增标签'"
-      width="680px"
+      :title="isEdit ? '编辑帖子' : '新增帖子'"
+      width="800px"
       @confirm="handleSubmit"
       @close="closeModal"
     >
-      <a-form :model="formData" :style="{ width: '100%' }">
-        <div class="grid grid-cols-2 gap-x-4 gap-y-2">
-          <a-form-item label="标签名称">
+      <a-form :model="formData" layout="vertical" :style="{ width: '100%' }">
+        <div class="space-y-4">
+          <!-- 标题 -->
+          <a-form-item
+            label="标题"
+            :rules="[
+              { required: true, message: '标题不能为空' },
+              { max: 32, message: '标题最多32个字符' },
+            ]"
+          >
             <a-input
-              v-model:value="formData.name"
-              placeholder="请输入标签名称"
-              :style="{ width: '220px' }"
+              v-model:value="formData.title"
+              placeholder="请输入帖子标题"
+              :maxlength="32"
+              show-count
             />
           </a-form-item>
-          <a-form-item label="标签状态">
+
+          <!-- 内容 -->
+          <a-form-item
+            label="内容"
+            :rules="[{ required: true, message: '内容不能为空' }]"
+          >
+            <a-textarea
+              v-model:value="formData.content"
+              placeholder="请输入帖子内容"
+              :auto-size="{ minRows: 4, maxRows: 8 }"
+            />
+          </a-form-item>
+
+          <div class="grid grid-cols-2 gap-x-4">
+            <!-- 话题分类 -->
+            <a-form-item
+              label="话题分类"
+              :rules="[{ required: true, message: '请选择话题分类' }]"
+            >
+              <a-select
+                v-model:value="formData.category"
+                placeholder="请选择话题分类"
+                :options="categoryOptions"
+              />
+            </a-form-item>
+
+            <!-- 帖子类型 -->
+            <a-form-item label="帖子类型">
+              <a-select
+                v-model:value="formData.type"
+                placeholder="请选择帖子类型"
+                :options="[
+                  { label: '普通帖子', value: 1 },
+                  { label: '精华帖子', value: 2 },
+                  { label: '置顶帖子', value: 3 },
+                ]"
+              />
+            </a-form-item>
+          </div>
+
+          <!-- 标签选择 -->
+          <a-form-item label="标签">
             <a-select
-              v-model:value="formData.status"
-              :options="[
-                { label: '启用', value: '1' },
-                { label: '停用', value: '0' },
-              ]"
-              :style="{ width: '220px' }"
+              v-model:value="formData.tagsList"
+              mode="multiple"
+              placeholder="请选择标签"
+              :options="tagsOptions"
+              :max-tag-count="3"
             />
           </a-form-item>
-          <a-form-item label="标签颜色">
-            <a-input
-              v-model:value="formData.color"
-              type="color"
-              :style="{ width: '220px', cursor: 'pointer' }"
+
+          <!-- 是否匿名 -->
+          <a-form-item label="匿名设置">
+            <a-switch
+              v-model:checked="formData.isAnonymous"
+              :checked-value="1"
+              :unchecked-value="0"
+              checked-children="匿名"
+              un-checked-children="实名"
             />
           </a-form-item>
         </div>
@@ -258,6 +310,8 @@ import {
   Modal as AModal,
   Avatar as AAvatar,
   Tag as ATag,
+  Switch as ASwitch,
+  Textarea as ATextarea,
 } from "ant-design-vue";
 
 const columns = [
@@ -330,9 +384,12 @@ const total = ref(0);
 const showModal = ref(false);
 const isEdit = ref(false);
 const formData = ref({
-  name: "",
-  status: "1", // 默认启用
-  color: "#843e87", // 修改默认颜色
+  title: "",
+  content: "",
+  category: undefined,
+  type: 1,
+  isAnonymous: 0,
+  tagsList: [],
 });
 const pageSize = ref(7);
 
@@ -358,13 +415,27 @@ const handleSizeChange = (current, size) => {
 
 const openModal = () => {
   isEdit.value = false;
-  formData.value = { name: "", status: "1", color: "#843e87" }; // 修改默认颜色
+  formData.value = {
+    title: "",
+    content: "",
+    category: undefined,
+    type: 1,
+    isAnonymous: 0,
+    tagsList: [],
+  };
   showModal.value = true;
 };
 
 const closeModal = () => {
   showModal.value = false;
-  formData.value = { name: "", status: "1", color: "#843e87" }; // 修改默认颜色
+  formData.value = {
+    title: "",
+    content: "",
+    category: undefined,
+    type: 1,
+    isAnonymous: 0,
+    tagsList: [],
+  };
 };
 
 // 修改直接编辑按钮的处理方法
@@ -562,12 +633,9 @@ const postDetail = ref(null);
 const handleDetail = async (row) => {
   try {
     const response = await postApi.getInfo(row.id);
-    if (response.data && response.data.code === 200) {
-      postDetail.value = response.data.data;
-      showDetailModal.value = true;
-    } else {
-      message.error(response.data?.msg || "获取详情失败");
-    }
+    // 修改判断逻辑，直接使用 response.data
+    postDetail.value = response.data;
+    showDetailModal.value = true;
   } catch (error) {
     console.error("获取详情失败:", error);
     message.error("获取详情失败");

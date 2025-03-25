@@ -202,7 +202,7 @@
 import { ref, computed, onMounted, nextTick, watch, onUnmounted } from "vue";
 import { useAuthStore } from "@/stores/auth"; // 修改为使用 auth store
 import { tags } from "../../../api/frontend/tags.js";
-import { blog } from "../../../api/frontend/blog.js";
+import { post } from "../../../api/frontend/post.js";
 import LoginCard from "../../../components/forum/NowLoginCard.vue";
 import PostCard from "../../../components/forum/PostCard.vue";
 import {
@@ -313,7 +313,7 @@ const searchTitle = ref("");
 const fetchArticles = async (category) => {
   try {
     loading.value = true;
-    const result = await blog.getPostList({
+    const result = await post.getPostList({
       category: category,
       pageNumber: pageNumber.value,
       pageSize: pageSize.value,
