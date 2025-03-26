@@ -9,6 +9,15 @@ export const getTopicList = (params) => {
 };
 
 export const topic = {
+
+    // 获取每日一题列表
+    getDailyTopicList() {
+        return request({
+            url: `/topic/daily`,
+            method: 'get'
+        })
+    },
+
     // 获取题库题目列表
     getTopicListByBankId(bankId) {
         return request({

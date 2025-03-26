@@ -1,50 +1,67 @@
 <template>
   <div class="custom-calendar rounded-2xl bg-white p-4">
-    <div class="text-xl font-bold mb-1 text-gray-900 text-left pl-2 pt-1">每日一题</div>
+    <div class="text-xl font-bold mb-1 text-gray-900 text-left pl-2 pt-1">
+      每日一题
+    </div>
     <table class="w-full border-separate border-spacing-0">
       <thead>
-      <tr>
-        <th v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']" :key="day"
-            class="py-3 text-center text-gray-600 text-sm">
-          {{ day }}
-        </th>
-      </tr>
+        <tr>
+          <th
+            v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']"
+            :key="day"
+            class="py-3 text-center text-gray-600 text-sm"
+          >
+            {{ day }}
+          </th>
+        </tr>
       </thead>
       <tbody>
-      <tr v-for="week in calendar" :key="week[0].date">
-        <td v-for="day in week" :key="day.date"
-            class="text-center relative h-[40px]">
-          <a-tooltip v-if="day.dayOfMonth && getQuestionByDate(day.date)" overlayClassName="calendar-tooltip">
-            <template #title>
-              <div class="flex flex-col items-center">
-                <span class="text-gray-400">{{ formatDate(day.date) }}</span>
-                <span class="mt-1">{{ getQuestionByDate(day.date) }}</span>
+        <tr v-for="week in calendar" :key="week[0].date">
+          <td
+            v-for="day in week"
+            :key="day.date"
+            class="text-center relative h-[40px]"
+          >
+            <a-tooltip
+              v-if="day.dayOfMonth && getQuestionByDate(day.date)"
+              overlayClassName="calendar-tooltip"
+            >
+              <template #title>
+                <div class="flex flex-col items-center">
+                  <span class="text-gray-400">{{ formatDate(day.date) }}</span>
+                  <span class="mt-1">{{ getQuestionByDate(day.date) }}</span>
+                </div>
+              </template>
+              <div
+                :class="[
+                  'w-8 h-8 mx-auto flex items-center justify-center rounded-full relative',
+                  'text-gray-900 transition-all duration-200 text-sm hover:bg-blue-50',
+                  {
+                    'bg-purple-500 text-white hover:bg-purple-600': day.isToday,
+                  },
+                ]"
+                @click="handleDateClick(day)"
+              >
+                {{ day.dayOfMonth }}
+                <!-- 添加小红点标识 -->
+                <div
+                  v-if="!isDateDone(day.date)"
+                  class="absolute bottom-0.5 left-1/2 transform -translate-x-1/3 w-1 h-1 bg-red-500 rounded-full"
+                ></div>
               </div>
-            </template>
-            <div 
+            </a-tooltip>
+            <div
+              v-else-if="day.dayOfMonth"
               :class="[
                 'w-8 h-8 mx-auto flex items-center justify-center rounded-full',
-                'text-gray-900 transition-all duration-200 text-sm hover:bg-blue-50',
-                {
-                  'bg-blue-500 text-white hover:bg-blue-600': day.isToday
-                }
+                'text-gray-900 text-sm',
+                { 'bg-blue-500 text-white': day.isToday },
               ]"
-              @click="handleDateClick(day)"
             >
               {{ day.dayOfMonth }}
             </div>
-          </a-tooltip>
-          <div v-else-if="day.dayOfMonth"
-               :class="[
-                 'w-8 h-8 mx-auto flex items-center justify-center rounded-full',
-                 'text-gray-900 text-sm',
-                 { 'bg-blue-500 text-white': day.isToday }
-               ]"
-          >
-            {{ day.dayOfMonth }}
-          </div>
-        </td>
-      </tr>
+          </td>
+        </tr>
       </tbody>
     </table>
     <!-- 分割线 -->
@@ -53,7 +70,9 @@
       <div class="flex flex-col items-center flex-1">
         <div class="text-sm text-gray-500 mt-1">连续提交</div>
         <div class="flex justify-center w-full items-center">
-          <span class="text-xl font-bold text-gray-800">{{ continuousSubmit }}</span>
+          <span class="text-xl font-bold text-gray-800">{{
+            continuousSubmit
+          }}</span>
           <span class="text-sm text-gray-500 ml-1 flex items-center">天</span>
         </div>
       </div>
@@ -74,37 +93,39 @@
         </div>
       </div>
     </div>
-    <div class="w-full">  <!-- 添加容器 -->
-      <ActivityHeatmap
-        :completion-data="completionData"
-        :cell-size="14"
-      />
+    <div class="w-full">
+      <!-- 添加容器 -->
+      <ActivityHeatmap :completion-data="completionData" :cell-size="14" />
     </div>
   </div>
 </template>
 
 <script setup>
-import {ref, computed, onMounted, onUnmounted} from 'vue';
-import dayjs from 'dayjs';
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import dayjs from "dayjs";
 import ActivityHeatmap from "./ActivityHeatmap.vue";
-import { Tooltip as ATooltip } from 'ant-design-vue';
+import { Tooltip as ATooltip } from "ant-design-vue";
 
-const continuousSubmit = ref(0)
-const monthSolved = ref(0)
-const dailyStreak = ref(0)
+const continuousSubmit = ref(0);
+const monthSolved = ref(0);
+const dailyStreak = ref(0);
 
 // 修改 props 的类型定义
 const props = defineProps({
   dayDetails: {
     type: Array,
-    required: true
+    required: true,
+    default: () => [],
   },
   completionData: {
     type: Array,
     required: true,
-    default: () => []
-  }
+    default: () => [],
+  },
 });
+
+import { useRouter } from "vue-router";
+const router = useRouter();
 
 // 当前日期的响应式引用
 const currentDate = ref(dayjs());
@@ -118,14 +139,14 @@ const updateCurrentDate = () => {
 
 // 格式化日期显示
 const formatDate = (date) => {
-  return dayjs(date).format('YYYY年MM月DD日');
+  return dayjs(date).format("YYYY年MM月DD日");
 };
 
 // 生成日历数据
 const generateCalendar = () => {
   const now = currentDate.value;
-  const startOfMonth = now.startOf('month');
-  const endOfMonth = now.endOf('month');
+  const startOfMonth = now.startOf("month");
+  const endOfMonth = now.endOf("month");
   const startDay = startOfMonth.day();
 
   const calendar = [];
@@ -133,16 +154,16 @@ const generateCalendar = () => {
 
   // 填充月初空白日期
   for (let i = 0; i < startDay; i++) {
-    currentWeek.push({date: '', dayOfMonth: '', isToday: false});
+    currentWeek.push({ date: "", dayOfMonth: "", isToday: false });
   }
 
   // 填充当月日期
   for (let day = 1; day <= endOfMonth.date(); day++) {
-    const date = startOfMonth.date(day).format('YYYY-MM-DD');
+    const date = startOfMonth.date(day).format("YYYY-MM-DD");
     currentWeek.push({
       date,
       dayOfMonth: day,
-      isToday: date === now.format('YYYY-MM-DD')
+      isToday: date === now.format("YYYY-MM-DD"),
     });
 
     if (currentWeek.length === 7) {
@@ -154,7 +175,7 @@ const generateCalendar = () => {
   // 填充月末空白日期
   if (currentWeek.length > 0) {
     while (currentWeek.length < 7) {
-      currentWeek.push({date: '', dayOfMonth: '', isToday: false});
+      currentWeek.push({ date: "", dayOfMonth: "", isToday: false });
     }
     calendar.push(currentWeek);
   }
@@ -183,21 +204,30 @@ onUnmounted(() => {
 
 const calendar = ref([]);
 
-// 添加根据日期获取问题的方法
+// 修改根据日期获取问题的方法
 const getQuestionByDate = (date) => {
   if (!date) return null;
-  const questionItem = props.dayDetails.find(item => item.Date === date);
+  const questionItem = props.dayDetails.find((item) => item.Date === date);
   return questionItem ? questionItem.Question : null;
 };
 
 // 修改点击事件处理
 const handleDateClick = (day) => {
-  const question = getQuestionByDate(day.date);
-  if (day.date && question) {
-    console.log(`今天是：${day.date}，题目：${question}`);
+  const questionItem = props.dayDetails.find((item) => item.Date === day.date);
+  if (day.date && questionItem?.topicId) {
+    router.push({
+      name: "SqlProblemDetail",
+      params: { id: questionItem.topicId },
+    });
   }
 };
 
+// 添加检查日期是否完成的方法
+const isDateDone = (date) => {
+  if (!date) return true;
+  const questionItem = props.dayDetails.find((item) => item.Date === date);
+  return questionItem ? questionItem.isDone : true;
+};
 </script>
 
 <style scoped>
@@ -249,5 +279,4 @@ const handleDateClick = (day) => {
 :global(.calendar-tooltip .ant-tooltip-arrow::after) {
   background-color: white !important;
 }
-
 </style>

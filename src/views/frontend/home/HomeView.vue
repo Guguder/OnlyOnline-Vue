@@ -95,31 +95,28 @@ import CustomCalendar from "../../../components/home/Calendar.vue";
 import HomePostCard from "../../../components/home/HomePostCard.vue";
 import { ref, onMounted } from "vue";
 import { post } from "../../../api/frontend/post";
+import { topic } from "../../../api/frontend/topic"; // 添加topic api引入
 
-// 修改为数组格式的模拟数据
-const mockDetails = [
-  {
-    Date: "2025-01-01",
-    Question: "Vue3的组合式API有哪些优势？请详细说明。",
-  },
-  {
-    Date: "2025-01-02",
-    Question: "说说你对Vue3中ref和reactive的理解？",
-  },
-  {
-    Date: "2025-01-03",
-    Question: "Vue3中的生命周期钩子有哪些变化？",
-  },
-  {
-    Date: "2025-01-04",
-    Question: "什么是Vue3的响应式原理？",
-  },
-  {
-    Date: "2025-01-05",
-    Question: "Vue3中的Teleport组件是什么？",
-  },
-  // ...其他数据项...
-];
+// 将mockDetails改为响应式数据
+const mockDetails = ref([]);
+
+// 获取每日话题列表
+const getDailyTopicList = async () => {
+  try {
+    const res = await topic.getDailyTopicList();
+    if (res.code === 200) {
+      // 转换数据格式以匹配现有结构，添加 topicId 和 isDone
+      mockDetails.value = res.data.map((item) => ({
+        Date: item.date,
+        Question: item.title,
+        topicId: item.topicId,
+        isDone: item.isDone, // 添加 isDone 字段
+      }));
+    }
+  } catch (error) {
+    console.error("获取每日话题失败:", error);
+  }
+};
 
 // 修改按钮数据，添加id和更有意义的名称
 const buttons = [
@@ -158,8 +155,8 @@ const handleButtonClick = async (buttonId) => {
 };
 
 // 组件挂载时获取文章列表
-onMounted(() => {
-  getArticles();
+onMounted(async () => {
+  await Promise.all([getArticles(), getDailyTopicList()]);
 });
 
 // 添加完成情况数据
