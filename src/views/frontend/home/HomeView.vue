@@ -64,13 +64,15 @@
           <!-- 文章列表区域 -->
           <div class="p-5">
             <div class="grid divide-y divide-gray-200">
-              <!-- 移除 overflow-hidden -->
-              <HomePostCard
-                v-for="article in articles"
-                :key="article.id"
-                :article="article"
-                class="first:pt-0 pt-4"
-              />
+              <div class="w-full overflow-hidden">
+                <HomePostCard
+                  v-for="article in articles"
+                  :key="article.id"
+                  :article="article"
+                  class="first:pt-0 pt-4"
+                  @click="handlePostClick(article.id)"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -96,6 +98,9 @@ import HomePostCard from "../../../components/home/HomePostCard.vue";
 import { ref, onMounted } from "vue";
 import { post } from "../../../api/frontend/post";
 import { topic } from "../../../api/frontend/topic"; // 添加topic api引入
+import { useRouter } from "vue-router"; // 添加路由导入
+
+const router = useRouter(); // 添加路由实例
 
 // 将mockDetails改为响应式数据
 const mockDetails = ref([]);
@@ -152,6 +157,13 @@ const getArticles = async () => {
 const handleButtonClick = async (buttonId) => {
   activeButton.value = buttonId;
   await getArticles();
+};
+
+// 修改跳转方法，使用完整的路由路径
+const handlePostClick = (id) => {
+  router.push({
+    path: `/post/${id}`, // 修改这里，使用path而不是name
+  });
 };
 
 // 组件挂载时获取文章列表

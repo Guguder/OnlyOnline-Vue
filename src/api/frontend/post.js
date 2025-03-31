@@ -17,10 +17,10 @@ export const post = {
             params
         })
     },
-    // 获取帖子详情
+    // 获取帖子信息
     getPostDetail(id) {
         return request({
-            url: `/blog/post/detail/${id}`,
+            url: `/blog/post/info/${id}`,
             method: 'get'
         })
     },

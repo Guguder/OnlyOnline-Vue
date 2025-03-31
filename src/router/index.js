@@ -45,6 +45,11 @@ const routes = [
         props: true
       },
       {
+        path: '/post/:id',
+        name: 'PostDetail',
+        component: () => import('../views/frontend/forum/PostDetailView.vue')
+      },
+      {
         path: 'notifications',
         name: 'notifications',
         component: () => import('../views/frontend/notice/NotificationsView.vue'),
